@@ -1,4 +1,6 @@
+
 /* BUBBLY PLAY — SHAPE SORTER */
+
 .shape-game {
   width: 100%;
   overflow: hidden;
@@ -143,6 +145,7 @@
   line-height: 1;
   font-size: clamp(35px, 10vw, 55px);
   filter: drop-shadow(0 4px 2px rgba(50, 50, 50, .18));
+  pointer-events: none;
 }
 
 .shape-piece[data-shape="circle"] .shape-symbol {
@@ -169,6 +172,12 @@
   opacity: .3;
 }
 
+.shape-piece.selected {
+  background: #e9e0ff;
+  outline: 3px solid #8c70f5;
+  transform: translateY(-5px) scale(1.05);
+}
+
 .shape-drag-ghost {
   position: fixed;
   z-index: 9999;
@@ -186,6 +195,7 @@
 .shape-drag-ghost .shape-symbol {
   font-size: 52px;
   line-height: 1;
+  pointer-events: none;
 }
 
 .shape-feedback {
@@ -208,9 +218,15 @@
 }
 
 @keyframes shapeLand {
-  0% { transform: scale(.65); }
-  75% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(.65);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 360px) {
@@ -228,5 +244,10 @@
   .shape-hole {
     border-width: 2px;
     border-radius: 11px;
+  }
+
+  .shape-piece .shape-symbol,
+  .shape-hole .shape-symbol {
+    font-size: 34px;
   }
 }
