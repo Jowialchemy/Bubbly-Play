@@ -1,452 +1,318 @@
+function setupShapeSorter() {
+  const area =
+    document.getElementById("playArea") ||
+    document.getElementById("play-area");
 
-const screens = ["home", "learn", "games", "rewards", "profile", "play"];
+  const feedback =
+    document.getElementById("playFeedback") ||
+    document.getElementById("play-feedback");
 
-const state = {
-  game: "bubble",
-  score: 0,
-  activities: 0,
-  stars: 0,
-  badges: 0,
-  popped: 0,
-  round: 0,
-  target: "",
-  paused: false,
-  roundComplete: false
-};
-
-const $ = id => document.getElementById(id);
-const playArea = $("playArea");
-const scene = $("gameScene");
-let toastTimer;
-let feedbackTimer;
-
-function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
-}
-
-function goTo(id) {
-  if (!screens.includes(id)) return;
-
-  screens.forEach(screen => {
-    $(screen).classList.toggle("active", screen === id);
-  });
-
-  document.querySelectorAll(".nav-item").forEach(button => {
-    button.classList.toggle("active", button.dataset.nav === id);
-  });
-
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  if (id !== "play") state.paused = false;
-  updateStats();
-}
-
-document.querySelectorAll("[data-nav]").forEach(button => {
-  button.addEventListener("click", () => goTo(button.dataset.nav));
-});
-
-document.querySelectorAll("[data-go]").forEach(button => {
-  button.addEventListener("click", () => goTo(button.dataset.go));
-});
-
-$("menuBtn").addEventListener("click", () => {
-  showToast("Welcome to Bubbly Play! 💜 Choose a section below.");
-});
-
-$("searchBtn").addEventListener("click", () => goTo("games"));
-
-$("storyBtn").addEventListener("click", () => {
-  showToast("🦁 Welcome to the Jungle Adventure! Ask your grown-up to read along.");
-  completeActivity(1);
-});
-
-["storiesBtn", "mathBtn", "scienceBtn", "artsBtn"].forEach(id => {
-  $(id).addEventListener("click", () => {
-    const names = {
-      storiesBtn: "Story Time 📚",
-      mathBtn: "Counting Fun 🔢",
-      scienceBtn: "Little Scientists 🧪",
-      artsBtn: "Creative Arts 🎨"
-    };
-    showToast(names[id] + " — more activities coming soon!");
-    completeActivity(1);
-  });
-});
-
-document.querySelectorAll("[data-game]").forEach(button => {
-  button.addEventListener("click", () => startGame(button.dataset.game));
-});
-
-$("backGames").addEventListener("click", () => {
-  state.paused = false;
-  goTo("games");
-});
-
-$("restartBtn").addEventListener("click", () => resetGame());
-
-$("pauseBtn").addEventListener("click", () => {
-  state.paused = !state.paused;
-  scene.classList.toggle("paused", state.paused);
-  $("pauseBtn").textContent = state.paused ? "▶" : "Ⅱ";
-  $("pauseBtn").setAttribute(
-    "aria-label", state.paused ? "Resume game" : "Pause game"
-  );
-
-  playArea.querySelectorAll("button").forEach(button => {
-    button.disabled = state.paused || state.roundComplete;
-  });
-
-  if (state.paused) {
-    $("playEncouragement").textContent = "Take your time. Tap ▶ when you're ready! 💜";
-  } else {
-    $("playEncouragement").textContent = "Let's keep playing! 🌟";
+  if (!area) {
+    console.error("Bubbly Play: Shape Sorter game area not found.");
+    return;
   }
-});
 
-function startGame(game) {
-  state.game = game;
-  state.paused = false;
-  state.score = 0;
-  state.popped = 0;
-  state.round = 0;
-  state.roundComplete = false;
-
-  goTo("play");
-  resetGame();
-}
-
-function resetGame() {
-  state.paused = false;
-  state.roundComplete = false;
-  state.score = 0;
-  state.popped = 0;
-
-  scene.classList.remove("paused", "success");
-  $("pauseBtn").textContent = "Ⅱ";
-  $("pauseBtn").setAttribute("aria-label", "Pause game");
-  $("gameScore").textContent = "0";
-  $("gameProgress").style.width = "0%";
-  $("playFeedback").textContent = "";
-  $("playEncouragement").textContent = "You're doing great! Every try is a win. 💜";
-  playArea.innerHTML = "";
-
-  if (state.game === "bubble") setupBubblePop();
-  if (state.game === "color") setupColorMatch();
-  if (state.game === "shape") setupShapeSorter();
-}
-
-function setGameHeader(title, prompt, instructions) {
-  $("playTitle").textContent = title;
-  $("playPrompt").textContent = prompt;
-  $("playInstructions").textContent = instructions;
-}
-
-function setFeedback(message) {
-  $("playFeedback").textContent = message;
-  clearTimeout(feedbackTimer);
-  feedbackTimer = setTimeout(() => {
-    if (!state.roundComplete) $("playFeedback").textContent = "";
-  }, 1700);
-}
-
-function addPoints(points = 1) {
-  state.score += points;
-  $("gameScore").textContent = state.score;
-  $("gameProgress").style.width =
-    Math.min(100, (state.score / 10) * 100) + "%";
-}
-
-function completeActivity(starsEarned = 1) {
-  state.activities++;
-  state.stars += starsEarned;
-
-  // Award each badge only once.
-  if (state.activities >= 1 && state.badges < 1) state.badges = 1;
-  if (state.activities >= 5 && state.badges < 2) state.badges = 2;
-  if (state.activities >= 10 && state.badges < 3) state.badges = 3;
-  if (state.activities >= 20 && state.badges < 4) state.badges = 4;
-
-  updateStats();
-}
-
-function updateStats() {
-  $("dailyText").textContent =
-    `${Math.min(state.activities, 5)} / 5 activities`;
-  $("dailyBar").style.width =
-    `${Math.min(100, (state.activities / 5) * 100)}%`;
-
-  $("statActivities").textContent = state.activities;
-  $("statStars").textContent = state.stars;
-  $("statBadges").textContent = state.badges;
-  $("profileStars").textContent = state.stars;
-  $("profileActivities").textContent = state.activities;
-  $("profileBadges").textContent = state.badges;
-
-  $("challengeBar").style.width =
-    `${Math.min(100, (state.activities / 10) * 100)}%`;
-}
-
-// BUBBLE POP: bubbles float continuously and pop on touch.
-const bubbleColors = [
-  ["#ff9cdb", "#ec4aa6"],
-  ["#ffe18a", "#ffb42f"],
-  ["#83efb7", "#27bd86"],
-  ["#83dcff", "#349be7"],
-  ["#c6a0ff", "#8759e7"],
-  ["#ffb49a", "#f47768"],
-  ["#a9c6ff", "#637fe9"]
-];
-
-function setupBubblePop() {
-  setGameHeader(
-    "Bubble Pop",
-    "Tap the bubbles! 🫧",
-    "Watch them float, then pop them!"
-  );
-
-  $("playEncouragement").textContent =
-    "Pop a bubble and watch it sparkle! ✨";
-
-  const positions = [
-    [5, 8], [37, 4], [68, 10],
-    [17, 28], [51, 27], [76, 34],
-    [3, 51], [34, 49], [61, 56],
-    [17, 72], [48, 75], [74, 73]
+  const shapes = [
+    { id: "circle", symbol: "●", label: "Circle" },
+    { id: "triangle", symbol: "▲", label: "Triangle" },
+    { id: "square", symbol: "■", label: "Square" },
+    { id: "star", symbol: "★", label: "Star" }
   ];
 
-  positions.forEach((position, index) => {
-    const bubble = document.createElement("button");
-    const colors = bubbleColors[index % bubbleColors.length];
-    const size = 48 + Math.round(Math.random() * 21);
+  let completed = 0;
+  let dragging = null;
+  let ghost = null;
+  let startX = 0;
+  let startY = 0;
 
-    bubble.className = "play-bubble";
-    bubble.style.setProperty("--x", position[0] + "%");
-    bubble.style.setProperty("--y", position[1] + "%");
-    bubble.style.setProperty("--size", size + "px");
-    bubble.style.setProperty("--bubble", colors[0]);
-    bubble.style.setProperty("--bubble-dark", colors[1]);
-    bubble.style.setProperty("--duration", (2.2 + Math.random() * 2) + "s");
-    bubble.style.setProperty("--drift", (Math.random() * 22 - 11) + "px");
-    bubble.style.animationDelay = (-Math.random() * 3) + "s";
-    bubble.setAttribute("aria-label", "Pop bubble");
-    bubble.textContent = "";
+  area.style.display = "block";
+  area.style.gridTemplateColumns = "none";
 
-    bubble.addEventListener("click", () => {
-      if (state.paused || state.roundComplete || bubble.disabled) return;
+  area.innerHTML = `
+    <div class="shape-game">
+      <div class="shape-game-header">
+        <button class="shape-round-button"
+          type="button" id="shapeBack" aria-label="Back to games">‹</button>
 
-      bubble.disabled = true;
-      bubble.classList.add("popped");
+        <h3>Shape Sorter</h3>
 
-      const rect = bubble.getBoundingClientRect();
-      const areaRect = playArea.getBoundingClientRect();
-      const sparkle = document.createElement("span");
+        <button class="shape-round-button"
+          type="button" id="shapeRestart" aria-label="Restart game">↻</button>
+      </div>
 
-      sparkle.className = "pop-sparkle";
-      sparkle.textContent = ["✨", "⭐", "💖", "✦"][Math.floor(Math.random() * 4)];
-      sparkle.style.left = (rect.left - areaRect.left + size / 2) + "px";
-      sparkle.style.top = (rect.top - areaRect.top + size / 2) + "px";
-      playArea.appendChild(sparkle);
+      <div class="shape-prompt">
+        Put the shapes in the right holes!
+      </div>
 
-      setTimeout(() => sparkle.remove(), 750);
-      setTimeout(() => bubble.remove(), 320);
+      <div class="shape-garden">
+        <div class="shape-board" aria-label="Shape holes">
+          ${shapes.map(shape => `
+            <div class="shape-hole"
+              data-hole="${shape.id}"
+              aria-label="${shape.label} hole"
+              role="group">
+              <span aria-hidden="true">⬤</span>
+            </div>
+          `).join("")}
+        </div>
 
-      state.popped++;
-      addPoints(1);
-      setFeedback(["Pop! ✨", "Amazing! ⭐", "Lovely! 💜", "Yay! 🫧"][state.popped % 4]);
+        <div class="shape-tray" aria-label="Shapes to move">
+          ${[...shapes].sort(() => Math.random() - 0.5).map(shape => `
+            <button class="shape-piece"
+              type="button"
+              data-shape="${shape.id}"
+              aria-label="Move ${shape.label}"
+              aria-grabbed="false">
+              <span class="shape-symbol" aria-hidden="true">${shape.symbol}</span>
+            </button>
+          `).join("")}
+        </div>
+      </div>
 
-      if (state.popped >= positions.length) {
-        finishRound("Amazing! You popped every bubble! 🌟");
-      }
-    });
+      <p class="shape-feedback" aria-live="polite">
+        Pick up a shape and find its hole! 🧩
+      </p>
+    </div>
+  `;
 
-    playArea.appendChild(bubble);
-  });
-}
+  const game = area.querySelector(".shape-game");
+  const message = game.querySelector(".shape-feedback");
+  const tray = game.querySelector(".shape-tray");
+  const holes = [...game.querySelectorAll(".shape-hole")];
 
-// COLOR MATCH: find the color named at the top.
-const colors = [
-  { name: "Red", value: "#ff6578" },
-  { name: "Yellow", value: "#ffce49" },
-  { name: "Blue", value: "#39b9f5" },
-  { name: "Green", value: "#39ce94" }
-];
-
-function setupColorMatch() {
-  setGameHeader(
-    "Color Match",
-    "Find the same color!",
-    "Look at the color name and tap its color."
-  );
-
-  nextColorRound();
-}
-
-function nextColorRound() {
-  state.roundComplete = false;
-  playArea.innerHTML = "";
-  scene.classList.remove("success");
-
-  const target = colors[Math.floor(Math.random() * colors.length)];
-  state.target = target.name;
-  $("playPrompt").textContent = `Find ${target.name}!`;
-  $("playInstructions").textContent = "Tap the matching color.";
-
-  const choices = [...colors].sort(() => Math.random() - 0.5);
-
-  const grid = document.createElement("div");
-  grid.className = "color-options";
-
-  choices.forEach(color => {
-    const button = document.createElement("button");
-    button.className = "color-choice";
-    button.style.background =
-      `radial-gradient(circle at 30% 25%, white 0%, ${color.value} 30%, ${color.value} 100%)`;
-    button.setAttribute("aria-label", color.name + " color");
-    button.textContent = "";
-
-    button.addEventListener("click", () => {
-      if (state.paused || state.roundComplete) return;
-
-      if (color.name === state.target) {
-        addPoints(1);
-        setFeedback("Yes! You found it! ⭐");
-
-        if (state.round >= 4) {
-          finishRound("Wonderful! You matched the colors! 🌈");
-        } else {
-          state.round++;
-          state.roundComplete = true;
-          setTimeout(() => {
-            if (state.game === "color" && !state.paused) {
-              nextColorRound();
-            }
-          }, 850);
-        }
-      } else {
-        setFeedback("Good try! Find " + state.target + ". 💜");
-        button.animate(
-          [
-            { transform: "translateX(0)" },
-            { transform: "translateX(-5px)" },
-            { transform: "translateX(5px)" },
-            { transform: "translateX(0)" }
-          ],
-          { duration: 250 }
-        );
-      }
-    });
-
-    grid.appendChild(button);
+  // Draw the recessed cutout shapes in the wooden board.
+  holes.forEach(hole => {
+    const shape = shapes.find(item => item.id === hole.dataset.hole);
+    hole.innerHTML = `
+      <span class="shape-symbol" aria-hidden="true">${shape.symbol}</span>
+    `;
   });
 
-  playArea.appendChild(grid);
-}
-
-// SHAPE SORTER: match the requested shape.
-const shapes = [
-  { name: "Circle", symbol: "●", color: "#ff719c" },
-  { name: "Triangle", symbol: "▲", color: "#3fa9ff" },
-  { name: "Square", symbol: "■", color: "#30c99a" },
-  { name: "Star", symbol: "★", color: "#ffbc42" }
-];
-
-function setupShapeSorter() {
-  setGameHeader(
-    "Shape Sorter",
-    "Find the right shape!",
-    "Tap the shape that matches the target."
-  );
-
-  nextShapeRound();
-}
-
-function nextShapeRound() {
-  state.roundComplete = false;
-  playArea.innerHTML = "";
-  scene.classList.remove("success");
-
-  const target = shapes[Math.floor(Math.random() * shapes.length)];
-  state.target = target.name;
-
-  $("playPrompt").textContent = `Find the ${target.name}!`;
-  $("playInstructions").textContent = "Which shape looks the same?";
-
-  const targetBox = document.createElement("div");
-  targetBox.className = "shape-target";
-  targetBox.style.color = target.color;
-  targetBox.textContent = target.symbol;
-  targetBox.setAttribute("aria-label", "Target shape: " + target.name);
-  playArea.appendChild(targetBox);
-
-  const grid = document.createElement("div");
-  grid.className = "shape-options";
-
-  [...shapes].sort(() => Math.random() - 0.5).forEach(shape => {
-    const button = document.createElement("button");
-    button.className = "shape-choice";
-    button.style.color = shape.color;
-    button.textContent = shape.symbol;
-    button.setAttribute("aria-label", shape.name);
-
-    button.addEventListener("click", () => {
-      if (state.paused || state.roundComplete) return;
-
-      if (shape.name === state.target) {
-        addPoints(1);
-        setFeedback("Perfect match! ⭐");
-
-        if (state.round >= 4) {
-          finishRound("Amazing! You sorted the shapes! 🔺");
-        } else {
-          state.round++;
-          state.roundComplete = true;
-          setTimeout(() => {
-            if (state.game === "shape" && !state.paused) {
-              nextShapeRound();
-            }
-          }, 850);
-        }
-      } else {
-        setFeedback("Nice try! Look for the " + state.target + ". 💜");
-      }
-    });
-
-    grid.appendChild(button);
+  // Return to the games list.
+  game.querySelector("#shapeBack").addEventListener("click", () => {
+    if (typeof goTo === "function") goTo("games");
   });
 
-  playArea.appendChild(grid);
-}
-
-function finishRound(message) {
-  state.roundComplete = true;
-  scene.classList.add("success");
-
-  playArea.querySelectorAll("button").forEach(button => {
-    button.disabled = true;
+  // Restart with a fresh board.
+  game.querySelector("#shapeRestart").addEventListener("click", () => {
+    setupShapeSorter();
   });
 
-  $("playPrompt").textContent = "You did it! 🎉";
-  $("playInstructions").textContent = "You are a little superstar!";
-  $("playFeedback").textContent = message;
-  $("playEncouragement").textContent =
-    "Wonderful playing! You can play again whenever you like. 💜";
+  function say(text) {
+    message.textContent = text;
 
-  completeActivity(Math.max(1, Math.ceil(state.score / 5)));
-
-  for (let i = 0; i < 7; i++) {
-    const sparkle = document.createElement("span");
-    sparkle.className = "pop-sparkle";
-    sparkle.textContent = ["⭐", "✨", "💖"][i % 3];
-    sparkle.style.left = (10 + Math.random() * 80) + "%";
-    sparkle.style.top = (15 + Math.random() * 65) + "%";
-    playArea.appendChild(sparkle);
-    setTimeout(() => sparkle.remove(), 1200);
+    if (feedback && feedback !== message) {
+      feedback.textContent = text;
+    }
   }
-}
 
-// Initial values
-updateStats();
+  function getShapeName(id) {
+    return shapes.find(shape => shape.id === id)?.label || "shape";
+  }
+
+  function finishGame() {
+    tray.innerHTML = `
+      <div class="shape-game-complete" style="grid-column:1/-1">
+        🎉 Amazing! You matched every shape! 🌟
+        <br>
+        <button type="button" class="shape-round-button"
+          id="shapePlayAgain"
+          style="width:auto;padding:0 20px;margin-top:12px">
+          Play Again ↻
+        </button>
+      </div>
+    `;
+
+    tray.querySelector("#shapePlayAgain").addEventListener("click", () => {
+      setupShapeSorter();
+    });
+
+    say("Wonderful work! You earned a star! ⭐");
+
+    // Award a star only if your app already provides this function.
+    if (typeof awardStar === "function") {
+      awardStar();
+    }
+  }
+
+  function placeShape(piece, hole) {
+    if (!piece || !hole) return;
+
+    if (piece.dataset.shape !== hole.dataset.hole) {
+      say("Good try! Find the matching shape. 💜");
+      hole.classList.remove("drag-over");
+      return;
+    }
+
+    const shape = shapes.find(item => item.id === piece.dataset.shape);
+
+    hole.classList.add("filled");
+    hole.innerHTML = `
+      <span class="shape-symbol" aria-label="${shape.label}">
+        ${shape.symbol}
+      </span>
+    `;
+
+    piece.remove();
+    completed++;
+
+    say(
+      completed === shapes.length
+        ? "You did it! All the shapes fit! 🌟"
+        : `Great job! You found the ${shape.label.toLowerCase()}! ✨`
+    );
+
+    if (completed === shapes.length) {
+      finishGame();
+    }
+  }
+
+  function clearDrag() {
+    if (ghost) {
+      ghost.remove();
+      ghost = null;
+    }
+
+    if (dragging) {
+      dragging.classList.remove("dragging");
+      dragging.setAttribute("aria-grabbed", "false");
+      dragging = null;
+    }
+
+    holes.forEach(hole => hole.classList.remove("drag-over"));
+  }
+
+  function moveGhost(x, y) {
+    if (!ghost) return;
+
+    ghost.style.left = x + "px";
+    ghost.style.top = y + "px";
+
+    // Highlight the hole underneath the moving shape.
+    holes.forEach(hole => {
+      const rect = hole.getBoundingClientRect();
+
+      const over =
+        x >= rect.left &&
+        x <= rect.right &&
+        y >= rect.top &&
+        y <= rect.bottom;
+
+      hole.classList.toggle("drag-over", over);
+    });
+  }
+
+  function onPointerMove(event) {
+    if (!dragging) return;
+
+    moveGhost(event.clientX, event.clientY);
+  }
+
+  function onPointerUp(event) {
+    if (!dragging) return;
+
+    const piece = dragging;
+    const x = event.clientX;
+    const y = event.clientY;
+
+    // Temporarily remove the ghost so the real hole can be detected.
+    if (ghost) ghost.style.display = "none";
+
+    const target = document.elementFromPoint(x, y);
+    const hole = target?.closest(".shape-hole");
+
+    if (ghost) ghost.style.display = "";
+
+    clearDrag();
+
+    if (hole && game.contains(hole)) {
+      placeShape(piece, hole);
+    } else {
+      say("Try moving the shape into its matching hole! 😊");
+    }
+
+    document.removeEventListener("pointermove", onPointerMove);
+    document.removeEventListener("pointerup", onPointerUp);
+    document.removeEventListener("pointercancel", onPointerCancel);
+  }
+
+  function onPointerCancel() {
+    clearDrag();
+
+    document.removeEventListener("pointermove", onPointerMove);
+    document.removeEventListener("pointerup", onPointerUp);
+    document.removeEventListener("pointercancel", onPointerCancel);
+  }
+
+  tray.addEventListener("pointerdown", event => {
+    const piece = event.target.closest(".shape-piece");
+
+    if (!piece || !tray.contains(piece)) return;
+
+    event.preventDefault();
+
+    dragging = piece;
+    startX = event.clientX;
+    startY = event.clientY;
+
+    const symbol = piece.querySelector(".shape-symbol");
+
+    ghost = document.createElement("div");
+    ghost.className = "shape-drag-ghost";
+    ghost.innerHTML = `
+      <span class="shape-symbol"
+        style="color:${getComputedStyle(symbol).color}">
+        ${symbol.textContent}
+      </span>
+    `;
+
+    document.body.appendChild(ghost);
+
+    piece.classList.add("dragging");
+    piece.setAttribute("aria-grabbed", "true");
+
+    moveGhost(startX, startY);
+
+    document.addEventListener("pointermove", onPointerMove, {
+      passive: false
+    });
+
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerCancel);
+  });
+
+  // Also let a child tap a shape, then tap its matching hole.
+  // This provides an easier alternative for very young learners.
+  let selectedPiece = null;
+
+  tray.addEventListener("click", event => {
+    const piece = event.target.closest(".shape-piece");
+
+    if (!piece || dragging) return;
+
+    if (selectedPiece === piece) {
+      selectedPiece.classList.remove("selected");
+      selectedPiece = null;
+      say("Choose a shape to move. 😊");
+      return;
+    }
+
+    if (selectedPiece) {
+      selectedPiece.classList.remove("selected");
+    }
+
+    selectedPiece = piece;
+    selectedPiece.classList.add("selected");
+    say(`Now tap the ${getShapeName(piece.dataset.shape).toLowerCase()} hole! 👆`);
+  });
+
+  holes.forEach(hole => {
+    hole.addEventListener("click", () => {
+      if (!selectedPiece) return;
+
+      const piece = selectedPiece;
+      selectedPiece = null;
+      placeShape(piece, hole);
+    });
+  });
+}
