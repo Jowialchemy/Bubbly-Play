@@ -1,1194 +1,211 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#eeeaff">
-<title>Bubbly Play — Little games. Big smiles!</title>
-
-<style>
-:root {
-  --purple: #8060ed;
-  --purple-dark: #6044cc;
-  --lavender: #f4f1ff;
-  --ink: #292744;
-  --muted: #77758f;
-  --shadow: 0 7px 20px rgba(87,68,158,.12);
-  --bottom-space: calc(100px + env(safe-area-inset-bottom, 0px));
-}
-
-* { box-sizing: border-box; }
-
-html {
-  scroll-behavior: smooth;
-  background: #eeeaff;
-}
-
-body {
-  margin: 0;
-  color: var(--ink);
-  font-family: "Trebuchet MS", system-ui, Arial, sans-serif;
-  background: linear-gradient(145deg,#e9e4ff,#f9f7ff 48%,#ece8ff);
-  min-height: 100vh;
-  -webkit-tap-highlight-color: transparent;
-}
-
-button {
-  font: inherit;
-  cursor: pointer;
-  border: 0;
-  touch-action: manipulation;
-}
-
-button:focus-visible {
-  outline: 3px solid #a998ff;
-  outline-offset: 3px;
-}
-
-.app {
-  width: min(100%,480px);
-  margin: 0 auto;
-  min-height: 100vh;
-  padding: calc(14px + env(safe-area-inset-top,0px)) 16px var(--bottom-space);
-  position: relative;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 46px;
-}
-
-.round-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: white;
-  color: var(--ink);
-  box-shadow: var(--shadow);
-  display: grid;
-  place-items: center;
-  font-size: 23px;
-  flex-shrink: 0;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  font-size: clamp(21px,5vw,27px);
-  font-weight: 900;
-  letter-spacing: -1px;
-  color: var(--purple);
-}
-
-.brand span:last-child { color: #f18a36; }
-
-.screen { display: none; animation: fadeIn .18s ease; }
-.screen.active { display: block; }
-
-.greeting {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 20px 0 22px;
-  padding: 19px 16px 16px;
-  border-radius: 28px;
-  background: linear-gradient(135deg,#fff,#f4efff 65%,#e5dcff);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  min-height: 190px;
-}
-
-.greeting-copy { flex: 1; min-width: 0; }
-
-.hello {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 5px;
-  font-weight: 700;
-}
-
-h1 {
-  font-size: clamp(23px,6vw,29px);
-  line-height: 1.12;
-  margin: 0 0 8px;
-  letter-spacing: -.8px;
-}
-
-.gradient-word {
-  background: linear-gradient(90deg,#8060ed,#f18a36);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.tagline {
-  font-weight: 800;
-  color: #6753ad;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.greeting-copy p {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--muted);
-  margin: 0;
-}
-
-.mascot-wrap {
-  width: 105px;
-  height: 130px;
-  flex-shrink: 0;
-  align-self: flex-end;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-.mascot-glow {
-  position: absolute;
-  width: 100px;
-  height: 112px;
-  bottom: 0;
-  border-radius: 55% 55% 30% 30%;
-  background: linear-gradient(145deg,#d8ccff,#9c82ff);
-  box-shadow: 0 8px 18px #c7b9ff;
-}
-
-.mascot {
-  position: relative;
-  z-index: 1;
-  font-size: 70px;
-  line-height: 1;
-  filter: drop-shadow(0 5px 3px #b9a9e8);
-}
-
-.sparkle {
-  position: absolute;
-  right: 2px;
-  top: 4px;
-  font-size: 25px;
-  z-index: 2;
-}
-
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin: 23px 3px 12px;
-}
-
-.section-head h2 {
-  font-size: 16px;
-  margin: 0;
-}
-
-.see-all {
-  background: transparent;
-  color: var(--purple-dark);
-  font-size: 12px;
-  font-weight: 800;
-  padding: 8px 3px;
-  white-space: nowrap;
-}
-
-.subjects {
-  display: grid;
-  grid-template-columns: repeat(4,minmax(0,1fr));
-  gap: 7px;
-  background: white;
-  padding: 12px 8px 10px;
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  margin-bottom: 18px;
-  border: 1px solid #e9e2fa;
-}
-
-.subject {
-  background: transparent;
-  color: var(--ink);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0 4px;
-  font-size: 11px;
-  font-weight: 700;
-  min-width: 0;
-}
-
-.subject .emoji {
-  width: clamp(46px,13vw,57px);
-  height: clamp(46px,13vw,57px);
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  font-size: clamp(25px,7vw,32px);
-  background: #eee9ff;
-}
-
-.subject:nth-child(2) .emoji { background: #fff0d9; }
-.subject:nth-child(3) .emoji { background: #def8f0; }
-.subject:nth-child(4) .emoji { background: #ffe6f0; }
-
-.goal {
-  background: linear-gradient(115deg,#9b83ff,#7558e9);
-  color: white;
-  border-radius: 25px;
-  padding: 15px 16px;
-  box-shadow: 0 8px 17px #d5c9ff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
-  overflow: hidden;
-}
-
-.goal-copy { flex: 1; min-width: 0; }
-
-.eyebrow {
-  font-size: 14px;
-  font-weight: 900;
-  margin-bottom: 7px;
-}
-
-.goal p {
-  font-size: 12px;
-  line-height: 1.5;
-  margin: 0 0 10px;
-  color: #f7f3ff;
-}
-
-.progress-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.progress {
-  height: 7px;
-  flex: 1;
-  max-width: 150px;
-  min-width: 65px;
-  background: #c7b9ff;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.progress span {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: white;
-  border-radius: 20px;
-  transition: width .25s;
-}
-
-.star-art {
-  font-size: 57px;
-  padding: 0 3px;
-}
-
-.continue-card {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  background: white;
-  padding: 10px;
-  border-radius: 23px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-  border: 1px solid #e9e2fa;
-  min-width: 0;
-}
-
-.story-art {
-  width: 76px;
-  height: 80px;
-  border-radius: 19px;
-  background: linear-gradient(145deg,#c7f3dc,#ffe0aa);
-  display: grid;
-  place-items: center;
-  font-size: 47px;
-  flex-shrink: 0;
-}
-
-.story-info { flex: 1; min-width: 0; }
-
-.story-info strong {
-  display: block;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.story-info small {
-  display: block;
-  color: var(--muted);
-  margin-top: 5px;
-  font-size: 11px;
-}
-
-.tiny-progress {
-  height: 5px;
-  background: #e7e1fb;
-  border-radius: 20px;
-  margin-top: 10px;
-  overflow: hidden;
-}
-
-.tiny-progress span {
-  display: block;
-  width: 25%;
-  height: 100%;
-  background: var(--purple);
-  border-radius: 20px;
-}
-
-.play-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--purple);
-  color: white;
-  font-size: 17px;
-  box-shadow: 0 5px 12px #d9d0ff;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-}
-
-.recommended {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 11px;
-}
-
-.recommend-card {
-  overflow: hidden;
-  background: white;
-  border-radius: 21px;
-  box-shadow: var(--shadow);
-  padding: 0 0 12px;
-  text-align: left;
-  color: var(--ink);
-  min-width: 0;
-  border: 1px solid #e9e2fa;
-}
-
-.recommend-art {
-  height: 102px;
-  display: grid;
-  place-items: center;
-  font-size: 52px;
-  background: linear-gradient(145deg,#b4e4ff,#9385f7);
-}
-
-.recommend-card:nth-child(2) .recommend-art {
-  background: linear-gradient(145deg,#d9f6b0,#ffdfa4);
-}
-
-.recommend-card strong {
-  display: block;
-  padding: 9px 10px 0;
-  font-size: 12px;
-}
-
-.recommend-card small {
-  display: block;
-  padding: 4px 10px 0;
-  color: var(--muted);
-  font-size: 10px;
-}
-
-.bottom-nav {
-  position: fixed;
-  left: 50%;
-  bottom: calc(8px + env(safe-area-inset-bottom,0px));
-  transform: translateX(-50%);
-  width: min(calc(100% - 20px),456px);
-  background: rgba(255,255,255,.97);
-  border: 1px solid #e9e3fa;
-  border-radius: 25px;
-  box-shadow: 0 7px 26px rgba(74,61,128,.18);
-  padding: 8px 5px 7px;
-  display: grid;
-  grid-template-columns: repeat(5,minmax(0,1fr));
-  z-index: 20;
-  backdrop-filter: blur(14px);
-}
-
-.nav-item {
-  background: transparent;
-  color: #9794aa;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 4px 0;
-  font-size: 10px;
-  min-width: 0;
-  min-height: 48px;
-  border-radius: 15px;
-}
-
-.nav-icon { font-size: 21px; line-height: 1.1; }
-
-.nav-item.active {
-  color: var(--purple-dark);
-  font-weight: 900;
-}
-
-.simple-hero {
-  background: linear-gradient(135deg,#c8f5ed,#e7ddff 78%);
-  border-radius: 25px;
-  padding: 21px 18px;
-  margin: 20px 0;
-  box-shadow: var(--shadow);
-}
-
-.simple-hero h2 {
-  margin: 0 0 8px;
-  font-size: 23px;
-  line-height: 1.2;
-}
-
-.simple-hero p {
-  margin: 0;
-  line-height: 1.5;
-  font-size: 13px;
-  color: #514e70;
-}
-
-.game-list { display: grid; gap: 12px; }
-
-.game-card {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  text-align: left;
-  background: white;
-  padding: 12px;
-  border-radius: 22px;
-  box-shadow: var(--shadow);
-  color: var(--ink);
-  border: 1px solid #e9e2fa;
-  width: 100%;
-  min-height: 96px;
-}
-
-.game-icon {
-  width: 70px;
-  height: 70px;
-  flex-shrink: 0;
-  border-radius: 20px;
-  background: linear-gradient(145deg,#eee8ff,#dcd2ff);
-  display: grid;
-  place-items: center;
-  font-size: 37px;
-}
-
-.game-card:nth-child(2) .game-icon {
-  background: linear-gradient(145deg,#fff0d9,#ffe2a4);
-}
-
-.game-card:nth-child(3) .game-icon {
-  background: linear-gradient(145deg,#dcf8f0,#b7eee1);
-}
-
-.game-card strong {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.game-card small {
-  color: var(--muted);
-  line-height: 1.45;
-  font-size: 12px;
-  display: block;
-}
-
-.card-arrow {
-  margin-left: auto;
-  color: var(--purple);
-  font-size: 24px;
-  padding: 0 4px;
-  flex-shrink: 0;
-}
-
-.reward-grid {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 12px;
-}
-
-.reward-card {
-  background: white;
-  border-radius: 22px;
-  box-shadow: var(--shadow);
-  padding: 17px 10px;
-  text-align: center;
-  border: 1px solid #ebe6fb;
-}
-
-.badge-art { font-size: 39px; margin-bottom: 8px; }
-
-.reward-card strong { display: block; font-size: 12px; }
-
-.reward-card small {
-  display: block;
-  color: var(--muted);
-  font-size: 10px;
-  margin-top: 5px;
-}
-
-.profile-card {
-  text-align: center;
-  background: white;
-  padding: 25px 18px;
-  border-radius: 27px;
-  box-shadow: var(--shadow);
-  margin-top: 20px;
-  border: 1px solid #ebe6fb;
-}
-
-.profile-avatar {
-  font-size: 74px;
-  width: 112px;
-  height: 112px;
-  border-radius: 50%;
-  margin: 0 auto 13px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(145deg,#f9ddec,#dcd0ff);
-}
-
-.profile-card h2 { font-size: 21px; margin: 0 0 7px; }
-
-.profile-card p {
-  color: var(--muted);
-  line-height: 1.5;
-  font-size: 13px;
-}
-
-.notice {
-  background: #fff8df;
-  padding: 12px 14px;
-  border-radius: 16px;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 17px;
-  color: #65522b;
-}
-
-.play-panel {
-  background: white;
-  border-radius: 25px;
-  box-shadow: var(--shadow);
-  padding: 14px;
-  border: 1px solid #ebe6fb;
-  margin-top: 14px;
-}
-
-.play-area {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 10px;
-}
-
-.play-choice {
-  min-height: 100px;
-  border-radius: 22px;
-  box-shadow: 0 5px 14px #e6e0f6;
-  font-size: 19px;
-  font-weight: 800;
-  color: #30294f;
-  padding: 8px;
-}
-
-.bubble-choice {
-  font-size: 50px;
-  color: white;
-  border: 4px solid rgba(255,255,255,.65);
-}
-
-.feedback {
-  min-height: 32px;
-  text-align: center;
-  color: var(--purple-dark);
-  font-weight: 900;
-  font-size: 16px;
-  margin: 15px 0 8px;
-}
-
-.game-controls {
-  display: flex;
-  justify-content: center;
-  gap: 9px;
-  flex-wrap: wrap;
-}
-
-.pill-btn {
-  background: #eee9ff;
-  color: var(--purple-dark);
-  padding: 12px 15px;
-  border-radius: 30px;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.empty-note {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12px;
-  margin: 18px 0;
-}
-
-.screen-title {
-  font-weight: 900;
-  font-size: 17px;
-}
-
-@keyframes fadeIn {
-  from { opacity: .5; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width:360px) {
-  .app { padding-left: 12px; padding-right: 12px; }
-  .greeting { padding: 15px 11px; }
-  .mascot-wrap { width: 82px; }
-  .mascot-glow { width: 80px; }
-  .mascot { font-size: 58px; }
-  h1 { font-size: 22px; }
-  .progress-row { font-size: 9px; }
-  .star-art { font-size: 44px; }
-  .story-art { width: 65px; height: 70px; font-size: 40px; }
-  .nav-item { font-size: 9px; }
-  .game-icon { width: 60px; height: 60px; }
-}
-
-@media (min-width:700px) {
-  body { padding: 20px 0; }
-  .app {
-    border-radius: 32px;
-    box-shadow: 0 10px 50px rgba(70,55,120,.1);
-    background: rgba(255,255,255,.3);
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e9e5ff">
+  <meta name="description" content="Bubbly Play — little games, big smiles!">
+  <title>Bubbly Play — Little games. Big smiles!</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<main class="app">
+  <main class="app">
 
-  <!-- HOME SCREEN -->
-  <section id="home" class="screen active">
-    <header class="topbar">
-      <button class="round-btn" aria-label="Menu"
-        onclick="showNotice('Ask your grown-up to help you explore Bubbly Play!')">☰</button>
-
-      <div class="brand">
-        <span>🫧</span><span>Bubbly</span><span>Play</span>
-      </div>
-
-      <button class="round-btn" aria-label="Find games"
-        onclick="goTo('games')">⌕</button>
+    <header class="brandbar">
+      <button class="circle-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <button class="brand" data-go="home" aria-label="Bubbly Play home">
+        <span class="brand-bubble">🫧</span>
+        <span>Bubbly <b>Play</b></span>
+      </button>
+      <button class="circle-btn" id="searchBtn" aria-label="Find a game">⌕</button>
     </header>
 
-    <div class="greeting">
-      <div class="greeting-copy">
-        <div class="hello">Hi, little learner! 👋</div>
-        <h1><span class="gradient-word">Bubbly Play!</span></h1>
-        <div class="tagline">Little games. Big smiles! ✨</div>
-        <h2 style="font-size:21px;line-height:1.25;margin:0 0 9px">
-          Ready to learn something awesome?
-        </h2>
-        <p>Explore, discover, and grow every day.</p>
+    <!-- HOME -->
+    <section class="screen active" id="home">
+      <div class="home-hero">
+        <div class="hero-copy">
+          <div class="hello">Hello, little star! 👋</div>
+          <h1>Ready to learn something awesome?</h1>
+          <p>Little games. Big smiles! ✨</p>
+          <span class="hero-caption">Explore, discover, and grow every day.</span>
+        </div>
+        <div class="hero-mascot" aria-label="Friendly little learner">👧🏻<span>✨</span></div>
+        <div class="floating-dot dot-one"></div>
+        <div class="floating-dot dot-two"></div>
       </div>
 
-      <div class="mascot-wrap" aria-label="Friendly character">
-        <div class="mascot-glow"></div>
-        <div class="mascot">👧🏻</div>
-        <div class="sparkle">✨</div>
+      <div class="section-heading">
+        <h2>Learning Categories</h2>
+        <button class="text-btn" data-go="learn">See all ›</button>
       </div>
-    </div>
+      <div class="category-grid">
+        <button class="category" data-go="learn"><span class="category-art purple">📚</span><b>Stories</b></button>
+        <button class="category" data-go="learn"><span class="category-art peach">🔢</span><b>Math</b></button>
+        <button class="category" data-go="learn"><span class="category-art mint">🧪</span><b>Science</b></button>
+        <button class="category" data-go="learn"><span class="category-art pink">🎨</span><b>Arts</b></button>
+      </div>
 
-    <div class="section-head">
-      <h2>Learning Categories</h2>
-      <button class="see-all" onclick="goTo('learn')">See all ›</button>
-    </div>
+      <div class="daily-card">
+        <div class="daily-copy">
+          <h3>⭐ Daily Goal</h3>
+          <p>Keep it up!<br>Every little step counts.</p>
+          <div class="daily-progress"><span id="dailyBar"></span></div>
+          <small id="dailyText">0 / 5 activities</small>
+        </div>
+        <div class="daily-star">🌟</div>
+      </div>
 
-    <div class="subjects" aria-label="Learning categories">
-      <button class="subject" onclick="goTo('learn')">
-        <span class="emoji">📚</span><span>Stories</span>
-      </button>
-      <button class="subject" onclick="goTo('learn')">
-        <span class="emoji">🔢</span><span>Math</span>
-      </button>
-      <button class="subject" onclick="goTo('learn')">
-        <span class="emoji">🧪</span><span>Science</span>
-      </button>
-      <button class="subject" onclick="goTo('learn')">
-        <span class="emoji">🎨</span><span>Arts</span>
-      </button>
-    </div>
+      <div class="section-heading">
+        <h2>Continue Learning</h2>
+        <button class="text-btn" data-go="learn">See all ›</button>
+      </div>
+      <article class="continue-card">
+        <div class="story-art">🦁</div>
+        <div class="card-copy">
+          <h3>The Jungle Adventure</h3>
+          <p>Story time · Little explorers</p>
+          <div class="mini-progress"><span style="width:60%"></span></div>
+        </div>
+        <button class="next-btn" id="storyBtn" aria-label="Continue story">▶</button>
+      </article>
 
-    <div class="goal">
-      <div class="goal-copy">
-        <div class="eyebrow">⭐ Daily Goal</div>
-        <p>Keep it up!<br>Every little step counts.</p>
-        <div class="progress-row">
-          <div class="progress"><span id="goal-progress"></span></div>
-          <span id="goal-label">0 / 5 activities</span>
+      <div class="section-heading">
+        <h2>Recommended for You</h2>
+        <button class="text-btn" data-go="games">See all ›</button>
+      </div>
+      <div class="recommend-grid">
+        <button class="recommend-card" data-game="color">
+          <div class="recommend-art space">🚀 ⭐</div>
+          <b>Space Explorer</b><small>Colors & discovery</small>
+        </button>
+        <button class="recommend-card" data-game="shape">
+          <div class="recommend-art jungle">🦕 🌴</div>
+          <b>Dino World</b><small>Shapes & fun</small>
+        </button>
+      </div>
+    </section>
+
+    <!-- LEARN -->
+    <section class="screen" id="learn">
+      <div class="page-heading"><span class="heading-emoji">🌈</span><div><h1>Let's Learn!</h1><p>Small steps, big discoveries.</p></div></div>
+      <div class="feature-banner learn-banner">
+        <div><h2>Small Steps<br>Big Learning!</h2><p>Explore, discover,<br>and grow!</p></div>
+        <span class="banner-mascot">🦉📖</span>
+      </div>
+      <div class="learning-list">
+        <button class="learning-card" id="storiesBtn"><span class="learning-art lilac">📚</span><span class="learning-copy"><b>Stories</b><small>Read and imagine</small><span class="mini-progress"><span style="width:60%"></span></span></span><span class="next-btn">›</span></button>
+        <button class="learning-card" id="mathBtn"><span class="learning-art peach">🔢</span><span class="learning-copy"><b>Math</b><small>Count and solve</small><span class="mini-progress"><span style="width:45%"></span></span></span><span class="next-btn">›</span></button>
+        <button class="learning-card" id="scienceBtn"><span class="learning-art mint">🧪</span><span class="learning-copy"><b>Science</b><small>Explore and experiment</small><span class="mini-progress"><span style="width:35%"></span></span></span><span class="next-btn">›</span></button>
+        <button class="learning-card" id="artsBtn"><span class="learning-art pink">🎨</span><span class="learning-copy"><b>Arts</b><small>Create and be creative</small><span class="mini-progress"><span style="width:50%"></span></span></span><span class="next-btn">›</span></button>
+      </div>
+    </section>
+
+    <!-- GAMES -->
+    <section class="screen" id="games">
+      <div class="page-heading"><span class="heading-emoji">🎮</span><div><h1>Games</h1><p>Play, discover, and smile!</p></div></div>
+      <div class="feature-banner games-banner">
+        <div><h2>Play & Learn!</h2><p>Fun games for<br>little learners!</p></div>
+        <span class="banner-mascot">🫧</span>
+      </div>
+      <div class="game-list">
+        <button class="game-card" data-game="bubble">
+          <span class="game-art bubble-art"><span>🫧</span>😊</span>
+          <span class="game-copy"><b>Bubble Pop</b><small>Tap the bubbles!</small><span class="mini-progress"><span style="width:35%"></span></span></span><span class="next-btn">›</span>
+        </button>
+        <button class="game-card" data-game="color">
+          <span class="game-art color-art"><span>🔴</span><span>🟡</span><span>🔵</span><span>🟢</span></span>
+          <span class="game-copy"><b>Color Match</b><small>Find the same color!</small><span class="mini-progress"><span style="width:45%"></span></span></span><span class="next-btn">›</span>
+        </button>
+        <button class="game-card" data-game="shape">
+          <span class="game-art shape-art"><span>🔺</span><span>⭐</span><span>🟦</span><span>🔵</span></span>
+          <span class="game-copy"><b>Shape Sorter</b><small>Find where shapes go!</small><span class="mini-progress"><span style="width:25%"></span></span></span><span class="next-btn">›</span>
+        </button>
+      </div>
+      <div class="safe-note">💜 Made for little learners — no ads, purchases, or outside links.</div>
+    </section>
+
+    <!-- REWARDS -->
+    <section class="screen" id="rewards">
+      <div class="page-heading"><span class="heading-emoji">🏆</span><div><h1>Rewards</h1><p>Every little try is wonderful!</p></div></div>
+      <div class="feature-banner rewards-banner">
+        <div><h2>You're Amazing!</h2><p>Keep learning and<br>collect rewards!</p></div>
+        <span class="banner-mascot">⭐</span>
+      </div>
+      <h3 class="section-title">Your Progress</h3>
+      <div class="stats-grid">
+        <div class="stat-card"><small>Activities</small><strong id="statActivities">0</strong><span>📚</span></div>
+        <div class="stat-card"><small>Stars Earned</small><strong id="statStars">0</strong><span>⭐</span></div>
+        <div class="stat-card"><small>Badges</small><strong id="statBadges">0</strong><span>🏅</span></div>
+      </div>
+      <h3 class="section-title">Your Badges</h3>
+      <div class="badge-grid">
+        <div class="badge-card"><span>🐾</span><small>First Steps</small></div>
+        <div class="badge-card"><span>🔢</span><small>Math Genius</small></div>
+        <div class="badge-card"><span>🧪</span><small>Science Star</small></div>
+        <div class="badge-card"><span>📖</span><small>Story Lover</small></div>
+      </div>
+      <div class="challenge-card"><span class="challenge-art">🐻</span><div><b>Little Star Challenge</b><p>Play and discover something new!</p><div class="mini-progress"><span id="challengeBar" style="width:0%"></span></div></div><span>🎁</span></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen" id="profile">
+      <div class="page-heading"><span class="heading-emoji">👧🏻</span><div><h1>My Profile</h1><p>A little star is growing!</p></div></div>
+      <div class="profile-card">
+        <div class="avatar-ring">👧🏻</div>
+        <h2>Little Star ⭐</h2>
+        <p>Keep being awesome!</p>
+        <div class="profile-stats">
+          <div><span>⭐</span><b id="profileStars">0</b><small>Stars</small></div>
+          <div><span>📚</span><b id="profileActivities">0</b><small>Activities</small></div>
+          <div><span>🏅</span><b id="profileBadges">0</b><small>Badges</small></div>
         </div>
       </div>
-      <div class="star-art" aria-hidden="true">🌟</div>
-    </div>
-
-    <div class="section-head">
-      <h2>Continue Learning</h2>
-      <button class="see-all" onclick="goTo('learn')">See all ›</button>
-    </div>
-
-    <div class="continue-card">
-      <div class="story-art" aria-hidden="true">🦁</div>
-      <div class="story-info">
-        <strong>The Jungle Adventure</strong>
-        <small>Story time · Little explorers</small>
-        <div class="tiny-progress"><span id="story-progress"></span></div>
+      <h3 class="section-title">My Favorites</h3>
+      <div class="favorites-grid">
+        <button data-game="bubble"><span>🫧</span><b>Bubble Pop</b></button>
+        <button data-game="color"><span>🎨</span><b>Colors</b></button>
+        <button data-game="shape"><span>🔺</span><b>Shapes</b></button>
       </div>
-      <button class="play-btn" aria-label="Play story"
-        onclick="showNotice('Story time! Ask your grown-up to tell you a fun jungle adventure.')">▶</button>
-    </div>
+      <div class="feature-banner profile-banner"><span class="banner-mascot">🫧</span><div><h2>You're brilliant!</h2><p>Keep exploring. 💗</p></div></div>
+      <div class="safe-note">A safe, happy place to learn through play. 💜</div>
+    </section>
 
-    <div class="section-head">
-      <h2>Recommended for You</h2>
-      <button class="see-all" onclick="goTo('games')">See all ›</button>
-    </div>
-
-    <div class="recommended">
-      <button class="recommend-card" onclick="startGame('bubble')">
-        <div class="recommend-art">🚀</div>
-        <strong>Space Explorer</strong>
-        <small>Discover and play</small>
-      </button>
-
-      <button class="recommend-card" onclick="startGame('shape')">
-        <div class="recommend-art">🦖</div>
-        <strong>Dino World</strong>
-        <small>Shapes and fun</small>
-      </button>
-    </div>
-  </section>
-
-  <!-- LEARN SCREEN -->
-  <section id="learn" class="screen" aria-label="Learn">
-    <header class="topbar">
-      <button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button>
-      <div class="screen-title">Learn</div>
-      <button class="round-btn" onclick="goTo('rewards')" aria-label="Rewards">🏆</button>
-    </header>
-
-    <div class="simple-hero">
-      <h2>Small Steps, Big Learning! 🌈</h2>
-      <p>Explore, discover, and grow. Choose something fun to learn today.</p>
-    </div>
-
-    <div class="game-list">
-      <button class="game-card" onclick="showNotice('Story time! Ask your grown-up to tell you a fun story.')">
-        <span class="game-icon">📚</span>
-        <span><strong>Stories</strong><small>Read, listen, and imagine new worlds.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="startGame('color')">
-        <span class="game-icon">🔢</span>
-        <span><strong>Math & Colours</strong><small>Explore colours and early learning.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="showNotice('Science is all around us! Ask your grown-up what you can discover safely.')">
-        <span class="game-icon">🧪</span>
-        <span><strong>Little Scientists</strong><small>Discover the world around you safely.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="showNotice('Art time! Ask a grown-up for paper and crayons, then draw something wonderful.')">
-        <span class="game-icon">🎨</span>
-        <span><strong>Arts & Creativity</strong><small>Imagine, draw, and make colourful things.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-    </div>
-  </section>
-
-  <!-- GAMES SCREEN -->
-  <section id="games" class="screen" aria-label="Games">
-    <header class="topbar">
-      <button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button>
-      <div class="screen-title">Games</div>
-      <button class="round-btn" onclick="goTo('rewards')" aria-label="Rewards">🏆</button>
-    </header>
-
-    <div class="simple-hero">
-      <h2>Play & Learn! 🫧</h2>
-      <p>Fun games for little learners. Play at your own pace!</p>
-    </div>
-
-    <div class="game-list">
-      <button class="game-card" onclick="startGame('bubble')">
-        <span class="game-icon">🫧</span>
-        <span><strong>Bubble Pop</strong><small>Tap the bubbles and watch them sparkle!</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="startGame('color')">
-        <span class="game-icon">🎨</span>
-        <span><strong>Color Match</strong><small>Find the colour that matches.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="startGame('shape')">
-        <span class="game-icon">🔺</span>
-        <span><strong>Shape Sorter</strong><small>Discover circles, triangles, and squares.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-    </div>
-
-    <div class="notice">
-      Made for little learners: no purchases, child-facing ads, or outside links in these screens.
-    </div>
-  </section>
-
-  <!-- REWARDS SCREEN -->
-  <section id="rewards" class="screen" aria-label="Rewards">
-    <header class="topbar">
-      <button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button>
-      <div class="screen-title">Rewards</div>
-      <span style="width:42px"></span>
-    </header>
-
-    <div class="simple-hero">
-      <h2>You're Amazing! 🌟</h2>
-      <p>Every try is a little achievement. Collect stars as you explore, at your own pace.</p>
-    </div>
-
-    <div class="section-head"><h2>Your Progress</h2></div>
-
-    <div class="subjects" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px">
-      <div class="subject"><span class="emoji">⭐</span><span id="stars-count">0 Stars</span></div>
-      <div class="subject"><span class="emoji">📚</span><span id="lessons-count">0 Activities</span></div>
-      <div class="subject"><span class="emoji">🏅</span><span id="badges-count">0 Badges</span></div>
-    </div>
-
-    <div class="section-head"><h2>Little Achievements</h2></div>
-
-    <div class="reward-grid">
-      <div class="reward-card"><div class="badge-art">🐾</div><strong>First Steps</strong><small id="badge-first">Ready when you are!</small></div>
-      <div class="reward-card"><div class="badge-art">🔢</div><strong>Math Genius</strong><small>Keep exploring</small></div>
-      <div class="reward-card"><div class="badge-art">🧪</div><strong>Science Star</strong><small>Curious minds shine</small></div>
-      <div class="reward-card"><div class="badge-art">📖</div><strong>Story Lover</strong><small>Imagine big things</small></div>
-    </div>
-
-    <div class="notice">
-      Every child learns differently. Enjoy the journey—there are no penalties or time limits. 💜
-    </div>
-  </section>
-
-  <!-- PROFILE SCREEN -->
-  <section id="profile" class="screen" aria-label="Profile">
-    <header class="topbar">
-      <button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button>
-      <div class="screen-title">Profile</div>
-      <button class="round-btn"
-        onclick="showNotice('Parent settings will be added in a future update. A grown-up should help with app settings.')"
-        aria-label="Settings">⚙</button>
-    </header>
-
-    <div class="profile-card">
-      <div class="profile-avatar">👧🏻</div>
-      <h2>Little Star 🌟</h2>
-      <p>Keep being awesome! You are learning every time you play.</p>
-
-      <div class="subjects" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:20px;margin-bottom:0">
-        <div class="subject"><span class="emoji">⭐</span><span id="profile-stars">0 Stars</span></div>
-        <div class="subject"><span class="emoji">📚</span><span id="profile-lessons">0 Lessons</span></div>
-        <div class="subject"><span class="emoji">🔥</span><span>Keep Going</span></div>
+    <!-- GAME PLAY -->
+    <section class="screen" id="play">
+      <div class="play-topbar">
+        <button class="circle-btn" id="backGames" aria-label="Back to games">‹</button>
+        <h2 id="playTitle">Bubble Pop</h2>
+        <button class="circle-btn pause-btn" id="pauseBtn" aria-label="Pause game">Ⅱ</button>
       </div>
-    </div>
-
-    <div class="section-head"><h2>My Favorites</h2></div>
-
-    <div class="game-list">
-      <button class="game-card" onclick="goTo('learn')">
-        <span class="game-icon">💗</span>
-        <span><strong>Stories</strong><small>Make-believe and adventures.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-
-      <button class="game-card" onclick="goTo('games')">
-        <span class="game-icon">🎮</span>
-        <span><strong>Games</strong><small>Play and learn something new.</small></span>
-        <span class="card-arrow">›</span>
-      </button>
-    </div>
-
-    <div class="notice">
-      A grown-up can help with settings. Parent authentication and parent controls are planned for a later stage.
-    </div>
-  </section>
-
-  <!-- GAME PLAY SCREEN -->
-  <section id="play" class="screen" aria-label="Game play">
-    <header class="topbar">
-      <button class="round-btn" onclick="goTo('games')" aria-label="Back to games">‹</button>
-      <div class="screen-title" id="play-title">Let's Play!</div>
-      <button class="round-btn" onclick="resetGame()" aria-label="Start game again">↻</button>
-    </header>
-
-    <div class="simple-hero">
-      <h2 id="play-prompt">Ready?</h2>
-      <p id="play-instructions">Tap the colorful things to play.</p>
-    </div>
-
-    <div class="play-panel">
-      <div id="play-area" class="play-area"></div>
-      <p id="play-feedback" class="feedback" aria-live="polite"></p>
-      <div class="game-controls">
-        <button class="pill-btn" onclick="resetGame()">Play again ↻</button>
-        <button class="pill-btn" onclick="goTo('games')">Other games</button>
+      <div class="game-scene" id="gameScene">
+        <div class="scene-cloud cloud-left"></div>
+        <div class="scene-cloud cloud-right"></div>
+        <div class="scene-sun">☀️</div>
+        <div class="scene-message" id="playPrompt">Tap the bubbles!</div>
+        <div class="scene-subtitle" id="playInstructions">Pop as many as you like.</div>
+        <div id="playArea" class="play-area"></div>
+        <div class="scene-feedback" id="playFeedback" aria-live="polite"></div>
+        <div class="game-hud">
+          <div class="score-pill">⭐ <b id="gameScore">0</b></div>
+          <div class="score-progress"><span id="gameProgress"></span></div>
+          <button class="restart-btn" id="restartBtn" aria-label="Play again">↻</button>
+        </div>
       </div>
-    </div>
+      <div class="play-encouragement" id="playEncouragement">You're doing great! Every try is a win. 💜</div>
+    </section>
 
-    <p class="empty-note">You're doing great! Try as many times as you like. 💜</p>
-  </section>
+    <!-- FIXED BOTTOM NAVIGATION -->
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="home"><span>⌂</span><small>Home</small></button>
+      <button class="nav-item" data-nav="learn"><span>🎓</span><small>Learn</small></button>
+      <button class="nav-item" data-nav="games"><span>🎮</span><small>Games</small></button>
+      <button class="nav-item" data-nav="rewards"><span>★</span><small>Rewards</small></button>
+      <button class="nav-item" data-nav="profile"><span>☺</span><small>Profile</small></button>
+    </nav>
+  </main>
 
-  <!-- FIXED BOTTOM NAVIGATION -->
-  <nav class="bottom-nav" aria-label="Main navigation">
-    <button class="nav-item active" data-screen="home" onclick="goTo('home')">
-      <span class="nav-icon">⌂</span><span>Home</span>
-    </button>
-    <button class="nav-item" data-screen="learn" onclick="goTo('learn')">
-      <span class="nav-icon">🎓</span><span>Learn</span>
-    </button>
-    <button class="nav-item" data-screen="games" onclick="goTo('games')">
-      <span class="nav-icon">🎮</span><span>Games</span>
-    </button>
-    <button class="nav-item" data-screen="rewards" onclick="goTo('rewards')">
-      <span class="nav-icon">★</span><span>Rewards</span>
-    </button>
-    <button class="nav-item" data-screen="profile" onclick="goTo('profile')">
-      <span class="nav-icon">☺</span><span>Profile</span>
-    </button>
-  </nav>
-
-</main>
-
-<script>
-const screenIds = ['home','learn','games','rewards','profile','play'];
-
-let currentGame = 'bubble';
-let bubbleCount = 0;
-let activitiesCompleted = 0;
-let starsEarned = 0;
-let gameWon = false;
-
-const $ = id => document.getElementById(id);
-
-function goTo(id) {
-  if (!screenIds.includes(id)) return;
-
-  screenIds.forEach(screen => {
-    $(screen).classList.toggle('active', screen === id);
-  });
-
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.screen === id);
-  });
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function showNotice(message) {
-  window.alert(message);
-}
-
-function startGame(game) {
-  currentGame = game;
-  goTo('play');
-  resetGame();
-}
-
-function recordActivity() {
-  if (gameWon) return;
-
-  gameWon = true;
-  activitiesCompleted++;
-  starsEarned += 3;
-  updateProgress();
-}
-
-function updateProgress() {
-  const daily = Math.min(activitiesCompleted, 5);
-
-  $('goal-progress').style.width = (daily / 5 * 100) + '%';
-  $('goal-label').textContent = daily + ' / 5 activities';
-
-  $('stars-count').textContent = starsEarned + ' Stars';
-  $('lessons-count').textContent = activitiesCompleted + ' Activities';
-  $('badges-count').textContent = activitiesCompleted > 0 ? '1 Badge' : '0 Badges';
-
-  $('profile-stars').textContent = starsEarned + ' Stars';
-  $('profile-lessons').textContent = activitiesCompleted + ' Lessons';
-
-  $('badge-first').textContent = activitiesCompleted > 0
-    ? 'You did it! 🌟'
-    : 'Ready when you are!';
-
-  $('story-progress').style.width =
-    activitiesCompleted > 0 ? '60%' : '25%';
-}
-
-function resetGame() {
-  const area = $('play-area');
-  const title = $('play-title');
-  const prompt = $('play-prompt');
-  const instructions = $('play-instructions');
-  const feedback = $('play-feedback');
-
-  area.innerHTML = '';
-  feedback.textContent = '';
-  gameWon = false;
-
-  if (currentGame === 'bubble') {
-    title.textContent = 'Bubble Pop';
-    prompt.textContent = 'Pop the bubbles! 🫧';
-    instructions.textContent = 'Tap each bubble to pop it. Great job!';
-    bubbleCount = 0;
-
-    area.style.gridTemplateColumns = 'repeat(2,minmax(0,1fr))';
-
-    const colors = [
-      '#a995ff','#ffacd0','#79dcca','#ffd36f',
-      '#8dd4ff','#c7a1ff','#ffbd8b','#a9e68b'
-    ];
-
-    colors.forEach((color, i) => {
-      const button = document.createElement('button');
-
-      button.className = 'play-choice bubble-choice';
-      button.style.background =
-        `radial-gradient(circle at 30% 25%, #fff 0 8%, ${color} 18%, ${color} 70%, #8c75e8 100%)`;
-
-      button.textContent = '●';
-      button.setAttribute('aria-label', 'Pop bubble ' + (i + 1));
-
-      button.onclick = () => {
-        if (button.disabled) return;
-
-        button.disabled = true;
-        button.textContent = '✨';
-        button.style.background = 'linear-gradient(145deg,#fff,#eee9ff)';
-
-        bubbleCount++;
-
-        if (bubbleCount === 8) {
-          recordActivity();
-          feedback.textContent = 'Amazing! You earned 3 stars! ⭐';
-        } else {
-          feedback.textContent = 'Pop! Great job! ✨';
-        }
-      };
-
-      area.appendChild(button);
-    });
-
-  } else if (currentGame === 'color') {
-    title.textContent = 'Color Match';
-
-    const choices = [
-      { name: 'Purple', color: '#a995ff' },
-      { name: 'Green', color: '#83dfb0' },
-      { name: 'Orange', color: '#ffc16e' }
-    ];
-
-    const target = choices[Math.floor(Math.random() * choices.length)];
-
-    prompt.textContent = 'Find ' + target.name.toLowerCase() + '!';
-    instructions.textContent = 'Tap the color that matches.';
-    area.style.gridTemplateColumns = 'repeat(3,minmax(0,1fr))';
-
-    choices.forEach(choice => {
-      const button = document.createElement('button');
-
-      button.className = 'play-choice';
-      button.style.background = choice.color;
-      button.textContent = choice.name;
-
-      button.onclick = () => {
-        if (choice.name === target.name) {
-          recordActivity();
-          feedback.textContent = 'Wonderful! You earned 3 stars! ⭐';
-        } else {
-          feedback.textContent =
-            'Nice try! Look for ' + target.name.toLowerCase() + '. 💜';
-        }
-      };
-
-      area.appendChild(button);
-    });
-
-  } else {
-    title.textContent = 'Shape Sorter';
-
-    const shapes = [
-      { name: 'Circle', symbol: '●', color: '#79cfff' },
-      { name: 'Triangle', symbol: '▲', color: '#ff91bd' },
-      { name: 'Square', symbol: '■', color: '#ffb66d' }
-    ];
-
-    const target = shapes[Math.floor(Math.random() * shapes.length)];
-
-    prompt.textContent = 'Find the ' + target.name.toLowerCase() + '!';
-    instructions.textContent = 'Tap the matching shape.';
-    area.style.gridTemplateColumns = 'repeat(3,minmax(0,1fr))';
-
-    shapes.forEach(shape => {
-      const button = document.createElement('button');
-
-      button.className = 'play-choice';
-      button.style.background = '#f8f5ff';
-      button.style.color = shape.color;
-      button.style.fontSize = '48px';
-      button.textContent = shape.symbol;
-      button.setAttribute('aria-label', shape.name);
-
-      button.onclick = () => {
-        if (shape.name === target.name) {
-          recordActivity();
-          feedback.textContent = 'Great matching! You earned 3 stars! ⭐';
-        } else {
-          feedback.textContent =
-            'Good try! Find the ' + target.name.toLowerCase() + '. 😊';
-        }
-      };
-
-      area.appendChild(button);
-    });
-  }
-}
-
-updateProgress();
-</script>
-
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
 </body>
-          </html>
+</html>
