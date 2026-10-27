@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubbly Play</title>
+  <style>
+    :root {
+      --purple: #8060ed;
+      --purple-dark: #6548d4;
+      --lavender: #eee9ff;
+      --ink: #28263a;
+      --muted: #77758b;
+      --card: #ffffff;
+      --shadow: 0 8px 22px rgba(74, 61, 128, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #f0edff, #faf8ff 55%, #f2edff);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      min-height: 100vh;
+    }
+    button { font: inherit; cursor: pointer; border: 0; }
+    .app {
+      width: min(100%, 460px);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 18px 16px 100px;
+      position: relative;
+    }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .round-btn {
+      width: 46px; height:46px; border-radius:50%; background:#fff;
+      box-shadow:var(--shadow); color:var(--ink); font-size:22px;
+      display:grid; place-items:center;
+    }
+    .search-btn { background:var(--purple); color:#fff; }
+    .greeting { display:flex; align-items:center; gap:8px; margin:22px 0 18px; }
+    .greeting-copy { flex:1; }
+    .hello { font-size:14px; color:var(--muted); margin-bottom:8px; }
+    h1 { font-size:27px; line-height:1.15; margin:0; letter-spacing:-.5px; }
+    .mascot {
+      font-size:78px; line-height:1; filter:drop-shadow(0 7px 4px #d8d0ff);
+      padding:4px 0 0;
+    }
+    .subjects {
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;
+      background:#fff; padding:13px 8px 10px; border-radius:27px;
+      box-shadow:var(--shadow); margin-bottom:18px;
+    }
+    .subject { background:transparent; color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px 0; font-size:12px; }
+    .subject .emoji { width:53px; height:53px; display:grid; place-items:center; border-radius:19px; font-size:29px; background:#eee9ff; }
+    .subject:nth-child(2) .emoji { background:#fff0d9; }
+    .subject:nth-child(3) .emoji { background:#dcf7f0; }
+    .subject:nth-child(4) .emoji { background:#ffe3ef; }
+    .goal {
+      background:linear-gradient(120deg,#9b83ff,#7255e8);
+      color:white; border-radius:27px; padding:17px 17px 14px;
+      box-shadow:0 8px 16px rgba(101,72,212,.23); display:flex; align-items:center; gap:8px;
+      margin-bottom:24px;
+    }
+    .goal-copy { flex:1; }
+    .eyebrow { font-size:13px; font-weight:700; margin-bottom:7px; }
+    .goal p { font-size:12px; line-height:1.5; margin:0 0 10px; color:#f5f1ff; }
+    .progress-row { display:flex; align-items:center; gap:10px; font-size:11px; }
+    .progress { height:6px; width:120px; background:rgba(255,255,255,.35); border-radius:20px; overflow:hidden; }
+    .progress span { display:block; height:100%; width:60%; background:white; border-radius:20px; }
+    .star { font-size:63px; filter:drop-shadow(0 5px 2px #6848ce); }
+    .section-head { display:flex; justify-content:space-between; align-items:center; margin:0 4px 12px; }
+    .section-head h2 { font-size:16px; margin:0; }
+    .see-all { background:none; color:var(--purple-dark); font-size:13px; font-weight:700; }
+    .continue-card {
+      display:flex; align-items:center; gap:12px; background:#fff; padding:10px;
+      border-radius:25px; box-shadow:var(--shadow); margin-bottom:24px;
+    }
+    .story-art { width:88px; height:88px; border-radius:20px; background:linear-gradient(145deg,#bdebd9,#ffd9a6); display:grid; place-items:center; font-size:51px; flex-shrink:0; }
+    .story-info { flex:1; min-width:0; }
+    .story-info strong { display:block; font-size:14px; line-height:1.3; }
+    .story-info small { display:block; color:var(--muted); margin-top:5px; font-size:11px; }
+    .tiny-progress { height:5px; background:#e5e0f7; border-radius:20px; margin-top:11px; overflow:hidden; }
+    .tiny-progress span { display:block; width:60%; height:100%; background:var(--purple); }
+    .play-btn { width:48px; height:48px; border-radius:50%; background:var(--purple); color:#fff; font-size:19px; box-shadow:0 5px 10px #d5ccff; flex-shrink:0; }
+    .recommended { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .recommend-card { overflow:hidden; background:#fff; border-radius:22px; box-shadow:var(--shadow); padding-bottom:12px; text-align:left; color:var(--ink); }
+    .recommend-art { height:112px; display:grid; place-items:center; font-size:56px; background:linear-gradient(145deg,#a7ddff,#7772e8); }
+    .recommend-card:nth-child(2) .recommend-art { background:linear-gradient(145deg,#d6f4a4,#ffdc9c); }
+    .recommend-card strong { display:block; padding:10px 10px 0; font-size:13px; }
+    .recommend-card small { display:block; padding:4px 10px 0; color:var(--muted); font-size:11px; }
+    .bottom-nav {
+      position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+      width:min(calc(100% - 24px), 436px); background:rgba(255,255,255,.96);
+      border:1px solid #f0edf8; border-radius:28px; box-shadow:0 7px 28px rgba(74,61,128,.18);
+      padding:9px 5px 7px; display:grid; grid-template-columns:repeat(5,1fr); z-index:10;
+      backdrop-filter:blur(10px);
+    }
+    .nav-item { background:transparent; color:#9290a2; display:flex; flex-direction:column; align-items:center; gap:4px; padding:3px 0; font-size:10px; }
+    .nav-item .nav-icon { font-size:22px; line-height:1.1; }
+    .nav-item.active { color:var(--purple-dark); font-weight:700; }
+    .screen { display:none; }
+    .screen.active { display:block; animation:fadeIn .2s ease; }
+    .simple-hero { background:linear-gradient(135deg,#b4f0e6,#d9ccff); border-radius:26px; padding:22px; margin:22px 0; }
+    .simple-hero h2 { margin:0 0 8px; font-size:24px; }
+    .simple-hero p { margin:0; line-height:1.5; }
+    .game-list { display:grid; gap:13px; }
+    .game-card { display:flex; align-items:center; gap:14px; text-align:left; background:#fff; padding:14px; border-radius:23px; box-shadow:var(--shadow); color:var(--ink); }
+    .game-icon { width:76px; height:76px; flex-shrink:0; border-radius:22px; background:#eee8ff; display:grid; place-items:center; font-size:39px; }
+    .game-card strong { display:block; margin-bottom:6px; }
+    .game-card small { color:var(--muted); line-height:1.4; }
+    .profile-card { text-align:center; background:white; padding:28px 20px; border-radius:27px; box-shadow:var(--shadow); margin-top:20px; }
+    .profile-avatar { font-size:72px; }
+    .profile-card p { color:var(--muted); line-height:1.5; }
+    .notice { background:#fff8dc; padding:12px 14px; border-radius:16px; font-size:12px; line-height:1.5; margin-top:18px; }
+    @keyframes fadeIn { from {opacity:.5; transform:translateY(4px)} to {opacity:1; transform:translateY(0)} }
+    @media (min-width:700px) {
+      body { padding:20px 0; }
+      .app { border-radius:32px; box-shadow:0 10px 50px rgba(70,55,120,.1); background:rgba(255,255,255,.3); }
+    }
+    @media (max-width:360px) {
+      .app { padding-left:12px; padding-right:12px; }
+      h1 { font-size:23px; }
+      .mascot { font-size:65px; }
+      .subject .emoji { width:46px; height:46px; }
+      .progress { width:90px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="home" class="screen active">
+      <div class="topbar">
+        <button class="round-btn" aria-label="Open menu" onclick="showNotice('Your grown-up can help you explore Bubbly Play!')">☰</button>
+        <button class="round-btn search-btn" aria-label="Search games" onclick="goTo('games')">⌕</button>
+      </div>
+      <div class="greeting">
+        <div class="greeting-copy">
+          <div class="hello">Hi, Champ! 👋</div>
+          <h1>Ready to learn something awesome today?</h1>
+        </div>
+        <div class="mascot" aria-label="Smiling child">🧒🏽</div>
+      </div>
+
+      <div class="subjects" aria-label="Learning categories">
+        <button class="subject" onclick="goTo('learn')"><span class="emoji">📚</span><span>Stories</span></button>
+        <button class="subject" onclick="goTo('games')"><span class="emoji">🔢</span><span>Math</span></button>
+        <button class="subject" onclick="goTo('learn')"><span class="emoji">🧪</span><span>Science</span></button>
+        <button class="subject" onclick="goTo('learn')"><span class="emoji">🎨</span><span>Arts</span></button>
+      </div>
+
+      <div class="goal">
+        <div class="goal-copy">
+          <div class="eyebrow">Daily Goal</div>
+          <p>Keep it up!<br>You're doing great.</p>
+          <div class="progress-row"><div class="progress"><span></span></div><span>3 / 5 Lessons</span></div>
+        </div>
+        <div class="star" aria-hidden="true">⭐</div>
+      </div>
+
+      <div class="section-head"><h2>Continue Learning</h2><button class="see-all" onclick="goTo('learn')">See all</button></div>
+      <div class="continue-card">
+        <div class="story-art" aria-hidden="true">🦁</div>
+        <div class="story-info"><strong>The Jungle Adventure</strong><small>Story</small><div class="tiny-progress"><span></span></div></div>
+        <button class="play-btn" aria-label="Play Jungle Adventure" onclick="showNotice('Story time! Ask your grown-up to read a jungle adventure with you.')">▶</button>
+      </div>
+
+      <div class="section-head"><h2>Recommended for You</h2><button class="see-all" onclick="goTo('games')">See all</button></div>
+      <div class="recommended">
+        <button class="recommend-card" onclick="goTo('games')"><div class="recommend-art">🚀</div><strong>Space Explorer</strong><small>Science</small></button>
+        <button class="recommend-card" onclick="goTo('games')"><div class="recommend-art">🦖</div><strong>Dino World</strong><small>Story</small></button>
+      </div>
+    </section>
+
+    <section id="learn" class="screen">
+      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Learn</strong><span style="width:46px"></span></div>
+      <div class="simple-hero"><h2>Let's learn through play! 🌈</h2><p>Little steps become big discoveries. Choose something fun to explore.</p></div>
+      <div class="game-list">
+        <button class="game-card" onclick="showNotice('Story time! Ask your grown-up to tell you a fun story.')"><span class="game-icon">📚</span><span><strong>Story Time</strong><small>Enjoy stories and imagine new worlds.</small></span></button>
+        <button class="game-card" onclick="goTo('games')"><span class="game-icon">🔢</span><span><strong>Counting Fun</strong><small>Explore numbers with playful activities.</small></span></button>
+        <button class="game-card" onclick="showNotice('Science is all around us. Ask your grown-up what you can discover safely!')"><span class="game-icon">🧪</span><span><strong>Little Scientists</strong><small>Discover the world around you safely.</small></span></button>
+      </div>
+    </section>
+
+    <section id="games" class="screen">
+      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Games</strong><span style="width:46px"></span></div>
+      <div class="simple-hero"><h2>Pick a game! 🎮</h2><p>Tap a big card and let the fun begin.</p></div>
+      <div class="game-list">
+        <button class="game-card" onclick="startGame('bubble')"><span class="game-icon">🫧</span><span><strong>Bubble Pop</strong><small>Pop the bubbles and watch them sparkle!</small></span></button>
+        <button class="game-card" onclick="startGame('color')"><span class="game-icon">🎨</span><span><strong>Color Match</strong><small>Find the color that matches.</small></span></button>
+        <button class="game-card" onclick="startGame('shape')"><span class="game-icon">🔺</span><span><strong>Shape Sorter</strong><small>Discover circles, triangles, and squares.</small></span></button>
+      </div>
+      <div class="notice">Made for little learners: no purchases, ads, or outside links on these screens.</div>
+    </section>
+
+    <section id="rewards" class="screen">
+      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Rewards</strong><span style="width:46px"></span></div>
+      <div class="simple-hero"><h2>Great job, you're a star! 🌟</h2><p>Every try is a little achievement. Keep exploring at your own pace.</p></div>
+      <div class="subjects">
+        <div class="subject"><span class="emoji">👣</span><span>First Steps</span></div>
+        <div class="subject"><span class="emoji">🔢</span><span>Math Star</span></div>
+        <div class="subject"><span class="emoji">🧪</span><span>Science Star</span></div>
+        <div class="subject"><span class="emoji">📖</span><span>Story Lover</span></div>
+      </div>
+      <div class="continue-card"><div class="story-art">🏆</div><div class="story-info"><strong>You're doing wonderfully!</strong><small>Play a game to earn your first star.</small></div></div>
+    </section>
+
+    <section id="profile" class="screen">
+      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Profile</strong><span style="width:46px"></span></div>
+      <div class="profile-card"><div class="profile-avatar">🧒🏽</div><h2>Hello, little learner!</h2><p>This is your safe little playground for learning and fun.</p><div class="notice">A grown-up can help with settings. Bubbly Play has no purchases enabled.</div></div>
+    </section>
+
+    <section id="play" class="screen">
+      <div class="topbar"><button class="round-btn" onclick="goTo('games')" aria-label="Back to games">‹</button><strong id="play-title">Let's Play!</strong><span style="width:46px"></span></div>
+      <div class="simple-hero"><h2 id="play-prompt">Ready?</h2><p id="play-instructions">Tap the colorful things to play.</p></div>
+      <div id="play-area" class="game-list"></div>
+      <p id="play-feedback" style="text-align:center;font-size:20px;font-weight:bold;color:#6548d4;min-height:32px"></p>
+      <button class="play-btn" style="display:block;margin:12px auto;width:62px;height:62px" onclick="resetGame()" aria-label="Play again">↻</button>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-screen="home" onclick="goTo('home')"><span class="nav-icon">⌂</span><span>Home</span></button>
+      <button class="nav-item" data-screen="learn" onclick="goTo('learn')"><span class="nav-icon">🎓</span><span>Learn</span></button>
+      <button class="nav-item" data-screen="games" onclick="goTo('games')"><span class="nav-icon">🎮</span><span>Games</span></button>
+      <button class="nav-item" data-screen="rewards" onclick="goTo('rewards')"><span class="nav-icon">★</span><span>Rewards</span></button>
+      <button class="nav-item" data-screen="profile" onclick="goTo('profile')"><span class="nav-icon">☺</span><span>Profile</span></button>
+    </nav>
+  </main>
+  <script>
+    const screenIds = ['home','learn','games','rewards','profile','play'];
+    let currentGame = 'bubble';
+    let bubbleCount = 0;
+    let colorTarget = 'Purple';
+    let shapeTarget = 'Circle';
+
+    function goTo(id) {
+      screenIds.forEach(screen => document.getElementById(screen).classList.toggle('active', screen === id));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.screen === id));
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function showNotice(message) {
+      alert(message);
+    }
+    function startGame(game) {
+      currentGame = game;
+      goTo('play');
+      resetGame();
+    }
+    function resetGame() {
+      const area = document.getElementById('play-area');
+      const title = document.getElementById('play-title');
+      const prompt = document.getElementById('play-prompt');
+      const instructions = document.getElementById('play-instructions');
+      const feedback = document.getElementById('play-feedback');
+      area.innerHTML = '';
+      feedback.textContent = '';
+      if (currentGame === 'bubble') {
+        title.textContent = 'Bubble Pop';
+        prompt.textContent = 'Pop the bubbles! 🫧';
+        instructions.textContent = 'Tap each bubble to pop it. Great job!';
+        bubbleCount = 0;
+        ['#9e8aff','#ffacd0','#79dcca','#ffd36f','#8dd4ff','#c7a1ff','#ffbd8b','#a9e68b'].forEach((color,i) => {
+          const b = document.createElement('button');
+          b.textContent = '●';
+          b.style.cssText = `font-size:60px;color:${color};background:#fff;border-radius:24px;min-height:100px;box-shadow:0 6px 16px #e6e0f6`;
+          b.setAttribute('aria-label','Pop bubble '+(i+1));
+          b.onclick = () => {
+            if (b.disabled) return;
+            b.disabled = true;
+            b.textContent = '✨';
+            b.style.color = '#8060ed';
+            bubbleCount++;
+            feedback.textContent = bubbleCount === 8 ? 'Amazing! You popped them all! ⭐' : 'Pop! Great job! ✨';
+          };
+          area.appendChild(b);
+        });
+        area.style.gridTemplateColumns = 'repeat(2,1fr)';
+      } else if (currentGame === 'color') {
+        title.textContent = 'Color Match';
+        const choices = [{name:'Purple',color:'#9b83ff'},{name:'Green',color:'#7dd9a8'},{name:'Orange',color:'#ffb86b'}];
+        colorTarget = choices[Math.floor(Math.random()*choices.length)].name;
+        const target = choices.find(c=>c.name===colorTarget);
+        prompt.textContent = `Find ${colorTarget.toLowerCase()}!`;
+        instructions.textContent = 'Tap the matching color.';
+        choices.forEach(c => {
+          const b = document.createElement('button');
+          b.style.cssText = `background:${c.color};min-height:105px;border-radius:24px;box-shadow:0 6px 16px #e6e0f6;color:#29263b;font-size:18px;font-weight:bold`;
+          b.textContent = c.name;
+          b.onclick = () => {
+            if(c.name === colorTarget) feedback.textContent = 'Yes! You found it! 🌟';
+            else feedback.textContent = 'Nice try! Look for '+colorTarget.toLowerCase()+'. 💜';
+          };
+          area.appendChild(b);
+        });
+        area.style.gridTemplateColumns = 'repeat(3,1fr)';
+      } else {
+        title.textContent = 'Shape Sorter';
+        const shapes = [{name:'Circle',symbol:'●',color:'#79cfff'},{name:'Triangle',symbol:'▲',color:'#ff9fc8'},{name:'Square',symbol:'■',color:'#ffb66d'}];
+        shapeTarget = shapes[Math.floor(Math.random()*shapes.length)].name;
+        prompt.textContent = `Find the ${shapeTarget.toLowerCase()}!`;
+        instructions.textContent = 'Tap the matching shape.';
+        shapes.forEach(s => {
+          const b = document.createElement('button');
+          b.style.cssText = `background:#fff;min-height:110px;border-radius:24px;box-shadow:0 6px 16px #e6e0f6;color:${s.color};font-size:56px`;
+          b.textContent = s.symbol;
+          b.setAttribute('aria-label',s.name);
+          b.onclick = () => {
+            if(s.name === shapeTarget) feedback.textContent = 'Wonderful matching! ⭐';
+            else feedback.textContent = 'Good try! Find the '+shapeTarget.toLowerCase()+'. 😊';
+          };
+          area.appendChild(b);
+        });
+        area.style.gridTemplateColumns = 'repeat(3,1fr)';
+      }
+    }
+  </script>
+</body>
+</html>
