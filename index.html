@@ -1,317 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubbly Play</title>
-  <style>
-    :root {
-      --purple: #8060ed;
-      --purple-dark: #6548d4;
-      --lavender: #eee9ff;
-      --ink: #28263a;
-      --muted: #77758b;
-      --card: #ffffff;
-      --shadow: 0 8px 22px rgba(74, 61, 128, .12);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #f0edff, #faf8ff 55%, #f2edff);
-      color: var(--ink);
-      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
-      min-height: 100vh;
-    }
-    button { font: inherit; cursor: pointer; border: 0; }
-    .app {
-      width: min(100%, 460px);
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 18px 16px 100px;
-      position: relative;
-    }
-    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .round-btn {
-      width: 46px; height:46px; border-radius:50%; background:#fff;
-      box-shadow:var(--shadow); color:var(--ink); font-size:22px;
-      display:grid; place-items:center;
-    }
-    .search-btn { background:var(--purple); color:#fff; }
-    .greeting { display:flex; align-items:center; gap:8px; margin:22px 0 18px; }
-    .greeting-copy { flex:1; }
-    .hello { font-size:14px; color:var(--muted); margin-bottom:8px; }
-    h1 { font-size:27px; line-height:1.15; margin:0; letter-spacing:-.5px; }
-    .mascot {
-      font-size:78px; line-height:1; filter:drop-shadow(0 7px 4px #d8d0ff);
-      padding:4px 0 0;
-    }
-    .subjects {
-      display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;
-      background:#fff; padding:13px 8px 10px; border-radius:27px;
-      box-shadow:var(--shadow); margin-bottom:18px;
-    }
-    .subject { background:transparent; color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px 0; font-size:12px; }
-    .subject .emoji { width:53px; height:53px; display:grid; place-items:center; border-radius:19px; font-size:29px; background:#eee9ff; }
-    .subject:nth-child(2) .emoji { background:#fff0d9; }
-    .subject:nth-child(3) .emoji { background:#dcf7f0; }
-    .subject:nth-child(4) .emoji { background:#ffe3ef; }
-    .goal {
-      background:linear-gradient(120deg,#9b83ff,#7255e8);
-      color:white; border-radius:27px; padding:17px 17px 14px;
-      box-shadow:0 8px 16px rgba(101,72,212,.23); display:flex; align-items:center; gap:8px;
-      margin-bottom:24px;
-    }
-    .goal-copy { flex:1; }
-    .eyebrow { font-size:13px; font-weight:700; margin-bottom:7px; }
-    .goal p { font-size:12px; line-height:1.5; margin:0 0 10px; color:#f5f1ff; }
-    .progress-row { display:flex; align-items:center; gap:10px; font-size:11px; }
-    .progress { height:6px; width:120px; background:rgba(255,255,255,.35); border-radius:20px; overflow:hidden; }
-    .progress span { display:block; height:100%; width:60%; background:white; border-radius:20px; }
-    .star { font-size:63px; filter:drop-shadow(0 5px 2px #6848ce); }
-    .section-head { display:flex; justify-content:space-between; align-items:center; margin:0 4px 12px; }
-    .section-head h2 { font-size:16px; margin:0; }
-    .see-all { background:none; color:var(--purple-dark); font-size:13px; font-weight:700; }
-    .continue-card {
-      display:flex; align-items:center; gap:12px; background:#fff; padding:10px;
-      border-radius:25px; box-shadow:var(--shadow); margin-bottom:24px;
-    }
-    .story-art { width:88px; height:88px; border-radius:20px; background:linear-gradient(145deg,#bdebd9,#ffd9a6); display:grid; place-items:center; font-size:51px; flex-shrink:0; }
-    .story-info { flex:1; min-width:0; }
-    .story-info strong { display:block; font-size:14px; line-height:1.3; }
-    .story-info small { display:block; color:var(--muted); margin-top:5px; font-size:11px; }
-    .tiny-progress { height:5px; background:#e5e0f7; border-radius:20px; margin-top:11px; overflow:hidden; }
-    .tiny-progress span { display:block; width:60%; height:100%; background:var(--purple); }
-    .play-btn { width:48px; height:48px; border-radius:50%; background:var(--purple); color:#fff; font-size:19px; box-shadow:0 5px 10px #d5ccff; flex-shrink:0; }
-    .recommended { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .recommend-card { overflow:hidden; background:#fff; border-radius:22px; box-shadow:var(--shadow); padding-bottom:12px; text-align:left; color:var(--ink); }
-    .recommend-art { height:112px; display:grid; place-items:center; font-size:56px; background:linear-gradient(145deg,#a7ddff,#7772e8); }
-    .recommend-card:nth-child(2) .recommend-art { background:linear-gradient(145deg,#d6f4a4,#ffdc9c); }
-    .recommend-card strong { display:block; padding:10px 10px 0; font-size:13px; }
-    .recommend-card small { display:block; padding:4px 10px 0; color:var(--muted); font-size:11px; }
-    .bottom-nav {
-      position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
-      width:min(calc(100% - 24px), 436px); background:rgba(255,255,255,.96);
-      border:1px solid #f0edf8; border-radius:28px; box-shadow:0 7px 28px rgba(74,61,128,.18);
-      padding:9px 5px 7px; display:grid; grid-template-columns:repeat(5,1fr); z-index:10;
-      backdrop-filter:blur(10px);
-    }
-    .nav-item { background:transparent; color:#9290a2; display:flex; flex-direction:column; align-items:center; gap:4px; padding:3px 0; font-size:10px; }
-    .nav-item .nav-icon { font-size:22px; line-height:1.1; }
-    .nav-item.active { color:var(--purple-dark); font-weight:700; }
-    .screen { display:none; }
-    .screen.active { display:block; animation:fadeIn .2s ease; }
-    .simple-hero { background:linear-gradient(135deg,#b4f0e6,#d9ccff); border-radius:26px; padding:22px; margin:22px 0; }
-    .simple-hero h2 { margin:0 0 8px; font-size:24px; }
-    .simple-hero p { margin:0; line-height:1.5; }
-    .game-list { display:grid; gap:13px; }
-    .game-card { display:flex; align-items:center; gap:14px; text-align:left; background:#fff; padding:14px; border-radius:23px; box-shadow:var(--shadow); color:var(--ink); }
-    .game-icon { width:76px; height:76px; flex-shrink:0; border-radius:22px; background:#eee8ff; display:grid; place-items:center; font-size:39px; }
-    .game-card strong { display:block; margin-bottom:6px; }
-    .game-card small { color:var(--muted); line-height:1.4; }
-    .profile-card { text-align:center; background:white; padding:28px 20px; border-radius:27px; box-shadow:var(--shadow); margin-top:20px; }
-    .profile-avatar { font-size:72px; }
-    .profile-card p { color:var(--muted); line-height:1.5; }
-    .notice { background:#fff8dc; padding:12px 14px; border-radius:16px; font-size:12px; line-height:1.5; margin-top:18px; }
-    @keyframes fadeIn { from {opacity:.5; transform:translateY(4px)} to {opacity:1; transform:translateY(0)} }
-    @media (min-width:700px) {
-      body { padding:20px 0; }
-      .app { border-radius:32px; box-shadow:0 10px 50px rgba(70,55,120,.1); background:rgba(255,255,255,.3); }
-    }
-    @media (max-width:360px) {
-      .app { padding-left:12px; padding-right:12px; }
-      h1 { font-size:23px; }
-      .mascot { font-size:65px; }
-      .subject .emoji { width:46px; height:46px; }
-      .progress { width:90px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eee9ff">
+<meta name="description" content="Bubbly Play — little games and big smiles for little learners.">
+<title>Bubbly Play — Little games. Big smiles!</title>
+<style>
+:root{--purple:#8060ed;--deep:#6548d4;--lav:#eee9ff;--ink:#292644;--muted:#77758d;--shadow:0 7px 22px rgba(74,61,128,.12);--line:#f0ebff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:linear-gradient(145deg,#e9e4ff,#faf8ff 52%,#e8e0ff);color:var(--ink);font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;border:0;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--deep);outline-offset:3px}
+.app{width:min(100%,480px);min-height:100vh;margin:auto;padding:15px 14px calc(112px + env(safe-area-inset-bottom));position:relative}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+.round{display:grid;place-items:center;width:43px;height:43px;flex-shrink:0;border-radius:50%;background:#fff;box-shadow:var(--shadow);color:var(--ink);font-size:22px}
+.brand{font-size:18px;font-weight:1000;color:#7251df;letter-spacing:-.5px}.brand span{color:#ff9848}
+.screen{display:none}.screen.active{display:block;animation:appear .2s ease-out}
+@keyframes appear{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.hero{display:flex;align-items:center;gap:7px;min-height:188px;margin:15px 0 19px;padding:17px 12px 15px 17px;overflow:hidden;border:1px solid #fff;border-radius:28px;background:radial-gradient(circle at 86% 14%,#fff 0 5px,transparent 6px),radial-gradient(circle at 68% 80%,#fff9ff 0 4px,transparent 5px),linear-gradient(135deg,#fff,#f5efff 52%,#d7cbff);box-shadow:var(--shadow)}
+.hero-copy{flex:1;min-width:0;position:relative;z-index:1}
+.logo{font-size:clamp(24px,6.3vw,30px);line-height:1.03;font-weight:1000;letter-spacing:-1px;color:#7251df;text-shadow:1px 2px #d8ccff;margin-bottom:8px}.logo span{color:#ff9848}
+.tagline{font-size:11px;font-weight:800;color:#6b579d;margin-bottom:12px}
+.hero h1{font-size:clamp(19px,5vw,24px);line-height:1.17;letter-spacing:-.5px;margin:0}
+.hero p{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+.mascot{width:clamp(88px,27vw,125px);height:124px;flex-shrink:0;display:grid;place-items:center;align-self:flex-end;position:relative;border-radius:55% 55% 32% 32%;background:linear-gradient(145deg,#eadfff,#b9a5ff);font-size:clamp(61px,17vw,80px);filter:drop-shadow(0 5px 5px #c9baf0)}
+.mascot .spark{position:absolute;top:4px;right:4px;font-size:22px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 3px 10px}
+.section-head h2{margin:0;font-size:15px;font-weight:900}
+.see{background:transparent;color:var(--deep);font-size:12px;font-weight:900;padding:7px 0 7px 8px}
+.subjects{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:11px 7px 9px;background:#fff;border:1px solid var(--line);border-radius:25px;box-shadow:var(--shadow)}
+.subject{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;min-width:0;min-height:76px;padding:3px 0;background:transparent;color:var(--ink);font-size:11px;font-weight:800}
+.subject-icon{width:clamp(43px,12vw,53px);height:clamp(43px,12vw,53px);display:grid;place-items:center;border-radius:17px;background:#e7ddff;font-size:27px;box-shadow:inset 0 -3px #00000008}
+.subject:nth-child(2) .subject-icon{background:#ffebd1}.subject:nth-child(3) .subject-icon{background:#d6f4ef}.subject:nth-child(4) .subject-icon{background:#ffe0ec}
+.goal{display:flex;align-items:center;gap:8px;position:relative;overflow:hidden;margin-top:16px;padding:16px;color:white;border-radius:25px;background:linear-gradient(120deg,#a28aff,#7a59ee 65%,#694bd7);box-shadow:0 8px 18px #6548d43b}
+.goal-copy{flex:1;min-width:0}.eyebrow{font-size:14px;font-weight:900;margin-bottom:7px}.goal p{margin:0 0 10px;color:#f7f3ff;font-size:12px;line-height:1.5}
+.goal-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:11px}.progress{width:110px;max-width:48%;height:7px;overflow:hidden;border-radius:20px;background:#ffffff59}.progress span{display:block;height:100%;width:0;background:#fff;border-radius:inherit;transition:width .25s}
+.big-star{font-size:55px;filter:drop-shadow(0 4px 2px #442b9140)}
+.continue{display:flex;align-items:center;gap:11px;padding:10px;border-radius:24px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+.story-art{display:grid;place-items:center;flex-shrink:0;width:78px;height:82px;border-radius:19px;background:linear-gradient(145deg,#c7f1dc,#ffdfb3);font-size:48px}
+.story-info{flex:1;min-width:0}.story-info strong{display:block;font-size:13px;line-height:1.35}.story-info small{display:block;margin-top:5px;color:var(--muted);font-size:11px}
+.tiny-progress{height:5px;margin-top:9px;overflow:hidden;border-radius:10px;background:#eae5fa}.tiny-progress span{display:block;width:0;height:100%;background:var(--purple)}
+.play-circle{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#9278ff,#6f4ce4);color:white;font-size:17px;box-shadow:0 4px 10px #d7ceff}
+.recommended{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.recommend{overflow:hidden;padding:0 0 12px;text-align:left;border-radius:22px;background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow)}
+.recommend-art{display:grid;place-items:center;height:105px;font-size:56px;background:linear-gradient(145deg,#b8e5ff,#8179ed)}
+.recommend:nth-child(2) .recommend-art{background:linear-gradient(145deg,#d8f5ae,#ffe0a4)}
+.recommend strong{display:block;padding:10px 10px 0;font-size:13px}.recommend small{display:block;padding:4px 10px 0;color:var(--muted);font-size:11px}
+.hero-panel{margin:16px 0;padding:22px 19px;border-radius:26px;background:linear-gradient(135deg,#d9f6ee,#d9ceff 75%,#e9ddff);box-shadow:var(--shadow)}
+.hero-panel h2{margin:0 0 8px;font-size:23px;line-height:1.2}.hero-panel p{margin:0;color:#615a7c;font-size:13px;line-height:1.55}
+.game-list{display:grid;gap:12px}
+.game-card{display:flex;align-items:center;gap:12px;width:100%;min-height:94px;padding:12px;text-align:left;border-radius:23px;background:#fff;color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--line)}
+.game-icon{display:grid;place-items:center;flex-shrink:0;width:70px;height:70px;border-radius:21px;background:#e9e1ff;font-size:38px}
+.game-card:nth-child(2) .game-icon{background:#d9f3ff}.game-card:nth-child(3) .game-icon{background:#ffe2ee}
+.game-copy{flex:1;min-width:0}.game-copy strong{display:block;margin-bottom:6px;font-size:14px}.game-copy small{display:block;color:var(--muted);font-size:12px;line-height:1.5}
+.arrow{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--purple);color:#fff;font-size:19px}
+.notice{padding:13px 15px;margin-top:17px;border-radius:17px;background:#fff4d6;color:#6b5930;font-size:12px;line-height:1.6}
+.reward-banner{display:flex;align-items:center;gap:10px;margin:17px 0;padding:20px;border-radius:25px;background:linear-gradient(120deg,#e8dcff,#f9dafa,#ffe4a6);box-shadow:var(--shadow)}
+.reward-banner .reward-star{font-size:58px}.reward-banner h2{margin:0 0 6px;font-size:22px}.reward-banner p{margin:0;font-size:12px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:15px 0 23px}
+.stat{padding:13px 4px;text-align:center;border-radius:19px;background:#fff;box-shadow:var(--shadow)}
+.stat .stat-icon{font-size:24px}.stat strong{display:block;margin-top:6px;font-size:21px}.stat small{display:block;margin-top:4px;color:var(--muted);font-size:10px}
+.badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.badge-card{text-align:center;padding:14px 4px;border-radius:18px;background:#fff;box-shadow:var(--shadow)}.badge-card.locked{opacity:.45}
+.badge-art{font-size:35px}.badge-card strong{display:block;margin-top:7px;font-size:11px}.badge-card small{display:block;margin-top:5px;color:var(--muted);font-size:10px}
+.profile-card{margin-top:18px;padding:25px 18px;text-align:center;border-radius:27px;background:#fff;box-shadow:var(--shadow)}
+.avatar{display:grid;place-items:center;width:108px;height:108px;margin:0 auto 15px;border:6px solid #fff;border-radius:50%;background:linear-gradient(145deg,#f6d9ff,#c8bcff);box-shadow:0 5px 18px #e0d5ff;font-size:64px}
+.profile-card h2{margin:0 0 8px;font-size:23px}.profile-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.favorites{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
+.favorite{padding:14px 4px;border-radius:18px;background:#fff;box-shadow:var(--shadow);color:var(--ink);font-size:12px;font-weight:800}.favorite span{display:block;margin-bottom:7px;font-size:27px}
+.play-prompt{margin:16px 0;padding:20px 14px;text-align:center;border-radius:24px;background:linear-gradient(135deg,#e1f7ff,#e9ddff)}
+.play-prompt h2{margin:0 0 8px;font-size:24px}.play-prompt p{margin:0;color:#635a86;font-size:13px;line-height:1.5}
+.play-area{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.choice{display:grid;place-items:center;min-width:0;min-height:108px;padding:10px;border:2px solid var(--line);border-radius:23px;background:#fff;color:var(--ink);box-shadow:var(--shadow);font-size:19px;font-weight:900}
+.bubble-choice{font-size:55px}.color-choice{min-height:118px}.shape-choice{font-size:60px}
+.feedback{display:grid;place-items:center;min-height:60px;margin:10px 0;padding:9px;text-align:center;color:var(--deep);font-size:16px;font-weight:900;line-height:1.4}
+.play-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.action{min-height:47px;padding:12px 19px;border-radius:17px;background:var(--purple);color:#fff;font-weight:900;box-shadow:0 5px 12px #ded5ff}.action.secondary{background:#fff;color:var(--deep)}
+.dots{display:flex;justify-content:center;gap:7px;margin:14px 0}.dots span{width:9px;height:9px;border-radius:50%;background:#dcd4f5}.dots span.done{background:var(--purple)}
+.bottom-nav{position:fixed;left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;width:min(calc(100% - 20px),460px);padding:8px 5px 6px;border:1px solid var(--line);border-radius:26px;background:#ffffffed;box-shadow:0 8px 30px #44337d30;backdrop-filter:blur(14px)}
+.nav-item{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;min-width:0;min-height:48px;padding:3px 0;border-radius:15px;background:transparent;color:#9490a7;font-size:10px}
+.nav-icon{font-size:22px;line-height:1.1}.nav-item.active{color:var(--deep);font-weight:900}.nav-item.active .nav-icon{transform:translateY(-1px)}
+.toast{position:fixed;z-index:40;left:50%;bottom:100px;transform:translateX(-50%);width:min(calc(100% - 34px),400px);padding:14px 17px;border-radius:18px;background:#33265f;color:#fff;text-align:center;font-size:13px;line-height:1.5;box-shadow:0 8px 25px #32245d45;display:none}
+.toast.show{display:block;animation:appear .18s ease-out}
+@media(max-width:360px){.app{padding-left:10px;padding-right:10px}.hero{padding-left:12px;min-height:170px}.mascot{width:80px;height:104px;font-size:57px}.logo{font-size:22px}.subject{font-size:10px}.story-art{width:66px;height:72px;font-size:39px}.game-icon{width:61px;height:65px}.play-area{gap:8px}.section-head h2{font-size:14px}}
+@media(min-width:700px){body{padding:20px 0}.app{min-height:calc(100vh - 40px);border-radius:32px;background:#ffffff35}.bottom-nav{bottom:18px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-  <main class="app">
-    <section id="home" class="screen active">
-      <div class="topbar">
-        <button class="round-btn" aria-label="Open menu" onclick="showNotice('Your grown-up can help you explore Bubbly Play!')">☰</button>
-        <button class="round-btn search-btn" aria-label="Search games" onclick="goTo('games')">⌕</button>
-      </div>
-      <div class="greeting">
-        <div class="greeting-copy">
-          <div class="hello">Hi, Champ! 👋</div>
-          <h1>Ready to learn something awesome today?</h1>
-        </div>
-        <div class="mascot" aria-label="Smiling child">🧒🏽</div>
-      </div>
+<main class="app">
+<section id="home" class="screen active">
+  <div class="topbar">
+    <button class="round" aria-label="About Bubbly Play" onclick="toast('Welcome to Bubbly Play! Ask your grown-up whenever you need help.')">☰</button>
+    <div class="brand">🫧 Bubbly <span>Play</span></div>
+    <button class="round" aria-label="Open games" onclick="goTo('games')">⌕</button>
+  </div>
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="logo">Bubbly <span>Play!</span></div>
+      <div class="tagline">Little games. Big smiles! ✨</div>
+      <h1>Ready to learn something awesome?</h1>
+      <p>Explore, discover, and grow every day.</p>
+    </div>
+    <div class="mascot" role="img" aria-label="Happy little learner">👧🏻<span class="spark">✨</span></div>
+  </div>
+  <div class="section-head"><h2>Learning Categories</h2><button class="see" onclick="goTo('learn')">See all ›</button></div>
+  <div class="subjects">
+    <button class="subject" onclick="lesson('stories')"><span class="subject-icon">📚</span><span>Stories</span></button>
+    <button class="subject" onclick="lesson('math')"><span class="subject-icon">🔢</span><span>Math</span></button>
+    <button class="subject" onclick="lesson('science')"><span class="subject-icon">🧪</span><span>Science</span></button>
+    <button class="subject" onclick="lesson('arts')"><span class="subject-icon">🎨</span><span>Arts</span></button>
+  </div>
+  <div class="goal"><div class="goal-copy"><div class="eyebrow">⭐ Daily Goal</div><p>Keep it up!<br>Every little step counts.</p><div class="goal-row"><div class="progress"><span id="daily-progress"></span></div><span id="daily-label">0 / 5 activities</span></div></div><div class="big-star">🌟</div></div>
+  <div class="section-head"><h2>Continue Learning</h2><button class="see" onclick="goTo('learn')">See all ›</button></div>
+  <div class="continue"><div class="story-art">🦁</div><div class="story-info"><strong>The Jungle Adventure</strong><small>Story time · Little explorers</small><div class="tiny-progress"><span id="story-progress"></span></div></div><button class="play-circle" aria-label="Open story" onclick="lesson('stories')">▶</button></div>
+  <div class="section-head"><h2>Recommended for You</h2><button class="see" onclick="goTo('games')">See all ›</button></div>
+  <div class="recommended">
+    <button class="recommend" onclick="startGame('shape')"><div class="recommend-art">🚀</div><strong>Space Explorer</strong><small>Shapes and discovery</small></button>
+    <button class="recommend" onclick="startGame('color')"><div class="recommend-art">🦖</div><strong>Dino World</strong><small>Colors and fun</small></button>
+  </div>
+  <div class="notice">💜 Learning should be fun. Take your time and celebrate every little discovery!</div>
+</section>
 
-      <div class="subjects" aria-label="Learning categories">
-        <button class="subject" onclick="goTo('learn')"><span class="emoji">📚</span><span>Stories</span></button>
-        <button class="subject" onclick="goTo('games')"><span class="emoji">🔢</span><span>Math</span></button>
-        <button class="subject" onclick="goTo('learn')"><span class="emoji">🧪</span><span>Science</span></button>
-        <button class="subject" onclick="goTo('learn')"><span class="emoji">🎨</span><span>Arts</span></button>
-      </div>
+<section id="learn" class="screen">
+  <div class="topbar"><button class="round" onclick="goTo('home')" aria-label="Back home">‹</button><span class="brand">Learn 🌈</span><button class="round" onclick="goTo('rewards')" aria-label="Rewards">🏆</button></div>
+  <div class="hero-panel"><h2>Small Steps, Big Learning!</h2><p>Little discoveries make a big difference. Choose something fun to explore today.</p></div>
+  <div class="game-list">
+    <button class="game-card" onclick="lesson('stories')"><span class="game-icon">📚</span><span class="game-copy"><strong>Story Time</strong><small>Listen, imagine, and discover wonderful worlds.</small></span><span class="arrow">›</span></button>
+    <button class="game-card" onclick="lesson('math')"><span class="game-icon">🔢</span><span class="game-copy"><strong>Counting Fun</strong><small>Explore numbers through playful activities.</small></span><span class="arrow">›</span></button>
+    <button class="game-card" onclick="lesson('science')"><span class="game-icon">🧪</span><span class="game-copy"><strong>Little Scientists</strong><small>Discover nature and the world around you.</small></span><span class="arrow">›</span></button>
+    <button class="game-card" onclick="lesson('arts')"><span class="game-icon">🎨</span><span class="game-copy"><strong>Creative Arts</strong><small>Explore colors, shapes, and imagination.</small></span><span class="arrow">›</span></button>
+  </div>
+  <div class="notice">Parents and caregivers can support learning by talking, reading, and playing together.</div>
+</section>
 
-      <div class="goal">
-        <div class="goal-copy">
-          <div class="eyebrow">Daily Goal</div>
-          <p>Keep it up!<br>You're doing great.</p>
-          <div class="progress-row"><div class="progress"><span></span></div><span>3 / 5 Lessons</span></div>
-        </div>
-        <div class="star" aria-hidden="true">⭐</div>
-      </div>
+<section id="games" class="screen">
+  <div class="topbar"><button class="round" onclick="goTo('home')" aria-label="Back home">‹</button><span class="brand">Games 🎮</span><button class="round" onclick="goTo('rewards')" aria-label="Rewards">🏆</button></div>
+  <div class="hero-panel"><h2>Play & Learn!</h2><p>Fun little games for curious little learners. Tap a game to begin.</p></div>
+  <div class="game-list">
+    <button class="game-card" onclick="startGame('bubble')"><span class="game-icon" style="background:#d9efff">🫧</span><span class="game-copy"><strong>Bubble Pop</strong><small>Tap the colorful bubbles and watch them pop!</small></span><span class="arrow">›</span></button>
+    <button class="game-card" onclick="startGame('color')"><span class="game-icon" style="background:#ffe2ec">🎨</span><span class="game-copy"><strong>Color Match</strong><small>Find the color that matches the prompt.</small></span><span class="arrow">›</span></button>
+    <button class="game-card" onclick="startGame('shape')"><span class="game-icon" style="background:#e3f7d7">🔺</span><span class="game-copy"><strong>Shape Sorter</strong><small>Discover circles, triangles, and squares.</small></span><span class="arrow">›</span></button>
+  </div>
+  <div class="notice">🛡️ No child-facing ads, purchases, or external game links are included in this prototype.</div>
+</section>
 
-      <div class="section-head"><h2>Continue Learning</h2><button class="see-all" onclick="goTo('learn')">See all</button></div>
-      <div class="continue-card">
-        <div class="story-art" aria-hidden="true">🦁</div>
-        <div class="story-info"><strong>The Jungle Adventure</strong><small>Story</small><div class="tiny-progress"><span></span></div></div>
-        <button class="play-btn" aria-label="Play Jungle Adventure" onclick="showNotice('Story time! Ask your grown-up to read a jungle adventure with you.')">▶</button>
-      </div>
+<section id="rewards" class="screen">
+  <div class="topbar"><button class="round" onclick="goTo('home')" aria-label="Back home">‹</button><span class="brand">Rewards 🏆</span><span style="width:43px"></span></div>
+  <div class="reward-banner"><div style="flex:1"><h2>You're Amazing!</h2><p>Every little discovery is worth celebrating. Keep exploring at your own pace.</p></div><div class="reward-star">🌟</div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-icon">⭐</div><strong id="reward-stars">0</strong><small>Stars Earned</small></div>
+    <div class="stat"><div class="stat-icon">📚</div><strong id="reward-lessons">0</strong><small>Activities</small></div>
+    <div class="stat"><div class="stat-icon">🏅</div><strong id="reward-badges">0</strong><small>Badges</small></div>
+  </div>
+  <div class="section-head"><h2>My Badges</h2></div>
+  <div class="badges">
+    <div class="badge-card locked" id="badge-first"><div class="badge-art">👣</div><strong>First Steps</strong><small>Complete an activity</small></div>
+    <div class="badge-card locked" id="badge-stars"><div class="badge-art">🌟</div><strong>Star Collector</strong><small>Earn 5 stars</small></div>
+    <div class="badge-card locked" id="badge-games"><div class="badge-art">🎮</div><strong>Game Explorer</strong><small>Try all 3 games</small></div>
+    <div class="badge-card locked" id="badge-colors"><div class="badge-art">🎨</div><strong>Color Genius</strong><small>Match a color</small></div>
+    <div class="badge-card locked" id="badge-shapes"><div class="badge-art">🔺</div><strong>Shape Star</strong><small>Find a shape</small></div>
+    <div class="badge-card locked" id="badge-bubbles"><div class="badge-art">🫧</div><strong>Bubble Buddy</strong><small>Pop all bubbles</small></div>
+  </div>
+  <div class="notice">🌈 There are no losing scores here. Every try is an opportunity to learn!</div>
+</section>
 
-      <div class="section-head"><h2>Recommended for You</h2><button class="see-all" onclick="goTo('games')">See all</button></div>
-      <div class="recommended">
-        <button class="recommend-card" onclick="goTo('games')"><div class="recommend-art">🚀</div><strong>Space Explorer</strong><small>Science</small></button>
-        <button class="recommend-card" onclick="goTo('games')"><div class="recommend-art">🦖</div><strong>Dino World</strong><small>Story</small></button>
-      </div>
-    </section>
+<section id="profile" class="screen">
+  <div class="topbar"><button class="round" onclick="goTo('home')" aria-label="Back home">‹</button><span class="brand">Profile</span><button class="round" onclick="toast('Parent settings are planned for a future version.') " aria-label="Settings">⚙</button></div>
+  <div class="profile-card"><div class="avatar">👧🏻</div><h2>Little Star ✨</h2><p>You're growing, learning, and doing wonderfully. Keep being you!</p></div>
+  <div class="section-head"><h2>My Favorites</h2></div>
+  <div class="favorites">
+    <button class="favorite" onclick="lesson('stories')"><span>💗</span>Stories</button>
+    <button class="favorite" onclick="startGame('color')"><span>🔢</span>Colors</button>
+    <button class="favorite" onclick="goTo('games')"><span>🎮</span>Games</button>
+  </div>
+  <div class="hero-panel" style="margin-top:20px;text-align:center"><div style="font-size:52px">🫧⭐</div><h2>You're brilliant!</h2><p>Every day is a new chance to discover something wonderful.</p></div>
+  <div class="notice">🔒 Parent controls and profile customization can be added later. This prototype has no payment features.</div>
+</section>
 
-    <section id="learn" class="screen">
-      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Learn</strong><span style="width:46px"></span></div>
-      <div class="simple-hero"><h2>Let's learn through play! 🌈</h2><p>Little steps become big discoveries. Choose something fun to explore.</p></div>
-      <div class="game-list">
-        <button class="game-card" onclick="showNotice('Story time! Ask your grown-up to tell you a fun story.')"><span class="game-icon">📚</span><span><strong>Story Time</strong><small>Enjoy stories and imagine new worlds.</small></span></button>
-        <button class="game-card" onclick="goTo('games')"><span class="game-icon">🔢</span><span><strong>Counting Fun</strong><small>Explore numbers with playful activities.</small></span></button>
-        <button class="game-card" onclick="showNotice('Science is all around us. Ask your grown-up what you can discover safely!')"><span class="game-icon">🧪</span><span><strong>Little Scientists</strong><small>Discover the world around you safely.</small></span></button>
-      </div>
-    </section>
+<section id="play" class="screen">
+  <div class="topbar"><button class="round" onclick="goTo('games')" aria-label="Back to games">‹</button><span class="brand" id="play-title">Let's Play!</span><button class="round" onclick="resetGame()" aria-label="Restart game">↻</button></div>
+  <div class="play-prompt"><h2 id="prompt-title">Ready to play?</h2><p id="instructions">Tap a colorful object to begin.</p></div>
+  <div class="dots" id="dots"></div>
+  <div class="play-area" id="play-area"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <div class="play-actions"><button class="action" onclick="resetGame()">Play Again ↻</button><button class="action secondary" onclick="goTo('games')">Other Games</button></div>
+</section>
 
-    <section id="games" class="screen">
-      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Games</strong><span style="width:46px"></span></div>
-      <div class="simple-hero"><h2>Pick a game! 🎮</h2><p>Tap a big card and let the fun begin.</p></div>
-      <div class="game-list">
-        <button class="game-card" onclick="startGame('bubble')"><span class="game-icon">🫧</span><span><strong>Bubble Pop</strong><small>Pop the bubbles and watch them sparkle!</small></span></button>
-        <button class="game-card" onclick="startGame('color')"><span class="game-icon">🎨</span><span><strong>Color Match</strong><small>Find the color that matches.</small></span></button>
-        <button class="game-card" onclick="startGame('shape')"><span class="game-icon">🔺</span><span><strong>Shape Sorter</strong><small>Discover circles, triangles, and squares.</small></span></button>
-      </div>
-      <div class="notice">Made for little learners: no purchases, ads, or outside links on these screens.</div>
-    </section>
-
-    <section id="rewards" class="screen">
-      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Rewards</strong><span style="width:46px"></span></div>
-      <div class="simple-hero"><h2>Great job, you're a star! 🌟</h2><p>Every try is a little achievement. Keep exploring at your own pace.</p></div>
-      <div class="subjects">
-        <div class="subject"><span class="emoji">👣</span><span>First Steps</span></div>
-        <div class="subject"><span class="emoji">🔢</span><span>Math Star</span></div>
-        <div class="subject"><span class="emoji">🧪</span><span>Science Star</span></div>
-        <div class="subject"><span class="emoji">📖</span><span>Story Lover</span></div>
-      </div>
-      <div class="continue-card"><div class="story-art">🏆</div><div class="story-info"><strong>You're doing wonderfully!</strong><small>Play a game to earn your first star.</small></div></div>
-    </section>
-
-    <section id="profile" class="screen">
-      <div class="topbar"><button class="round-btn" onclick="goTo('home')" aria-label="Back home">‹</button><strong>Profile</strong><span style="width:46px"></span></div>
-      <div class="profile-card"><div class="profile-avatar">🧒🏽</div><h2>Hello, little learner!</h2><p>This is your safe little playground for learning and fun.</p><div class="notice">A grown-up can help with settings. Bubbly Play has no purchases enabled.</div></div>
-    </section>
-
-    <section id="play" class="screen">
-      <div class="topbar"><button class="round-btn" onclick="goTo('games')" aria-label="Back to games">‹</button><strong id="play-title">Let's Play!</strong><span style="width:46px"></span></div>
-      <div class="simple-hero"><h2 id="play-prompt">Ready?</h2><p id="play-instructions">Tap the colorful things to play.</p></div>
-      <div id="play-area" class="game-list"></div>
-      <p id="play-feedback" style="text-align:center;font-size:20px;font-weight:bold;color:#6548d4;min-height:32px"></p>
-      <button class="play-btn" style="display:block;margin:12px auto;width:62px;height:62px" onclick="resetGame()" aria-label="Play again">↻</button>
-    </section>
-
-    <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="nav-item active" data-screen="home" onclick="goTo('home')"><span class="nav-icon">⌂</span><span>Home</span></button>
-      <button class="nav-item" data-screen="learn" onclick="goTo('learn')"><span class="nav-icon">🎓</span><span>Learn</span></button>
-      <button class="nav-item" data-screen="games" onclick="goTo('games')"><span class="nav-icon">🎮</span><span>Games</span></button>
-      <button class="nav-item" data-screen="rewards" onclick="goTo('rewards')"><span class="nav-icon">★</span><span>Rewards</span></button>
-      <button class="nav-item" data-screen="profile" onclick="goTo('profile')"><span class="nav-icon">☺</span><span>Profile</span></button>
-    </nav>
-  </main>
-  <script>
-    const screenIds = ['home','learn','games','rewards','profile','play'];
-    let currentGame = 'bubble';
-    let bubbleCount = 0;
-    let colorTarget = 'Purple';
-    let shapeTarget = 'Circle';
-
-    function goTo(id) {
-      screenIds.forEach(screen => document.getElementById(screen).classList.toggle('active', screen === id));
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.screen === id));
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
-    function showNotice(message) {
-      alert(message);
-    }
-    function startGame(game) {
-      currentGame = game;
-      goTo('play');
-      resetGame();
-    }
-    function resetGame() {
-      const area = document.getElementById('play-area');
-      const title = document.getElementById('play-title');
-      const prompt = document.getElementById('play-prompt');
-      const instructions = document.getElementById('play-instructions');
-      const feedback = document.getElementById('play-feedback');
-      area.innerHTML = '';
-      feedback.textContent = '';
-      if (currentGame === 'bubble') {
-        title.textContent = 'Bubble Pop';
-        prompt.textContent = 'Pop the bubbles! 🫧';
-        instructions.textContent = 'Tap each bubble to pop it. Great job!';
-        bubbleCount = 0;
-        ['#9e8aff','#ffacd0','#79dcca','#ffd36f','#8dd4ff','#c7a1ff','#ffbd8b','#a9e68b'].forEach((color,i) => {
-          const b = document.createElement('button');
-          b.textContent = '●';
-          b.style.cssText = `font-size:60px;color:${color};background:#fff;border-radius:24px;min-height:100px;box-shadow:0 6px 16px #e6e0f6`;
-          b.setAttribute('aria-label','Pop bubble '+(i+1));
-          b.onclick = () => {
-            if (b.disabled) return;
-            b.disabled = true;
-            b.textContent = '✨';
-            b.style.color = '#8060ed';
-            bubbleCount++;
-            feedback.textContent = bubbleCount === 8 ? 'Amazing! You popped them all! ⭐' : 'Pop! Great job! ✨';
-          };
-          area.appendChild(b);
-        });
-        area.style.gridTemplateColumns = 'repeat(2,1fr)';
-      } else if (currentGame === 'color') {
-        title.textContent = 'Color Match';
-        const choices = [{name:'Purple',color:'#9b83ff'},{name:'Green',color:'#7dd9a8'},{name:'Orange',color:'#ffb86b'}];
-        colorTarget = choices[Math.floor(Math.random()*choices.length)].name;
-        const target = choices.find(c=>c.name===colorTarget);
-        prompt.textContent = `Find ${colorTarget.toLowerCase()}!`;
-        instructions.textContent = 'Tap the matching color.';
-        choices.forEach(c => {
-          const b = document.createElement('button');
-          b.style.cssText = `background:${c.color};min-height:105px;border-radius:24px;box-shadow:0 6px 16px #e6e0f6;color:#29263b;font-size:18px;font-weight:bold`;
-          b.textContent = c.name;
-          b.onclick = () => {
-            if(c.name === colorTarget) feedback.textContent = 'Yes! You found it! 🌟';
-            else feedback.textContent = 'Nice try! Look for '+colorTarget.toLowerCase()+'. 💜';
-          };
-          area.appendChild(b);
-        });
-        area.style.gridTemplateColumns = 'repeat(3,1fr)';
-      } else {
-        title.textContent = 'Shape Sorter';
-        const shapes = [{name:'Circle',symbol:'●',color:'#79cfff'},{name:'Triangle',symbol:'▲',color:'#ff9fc8'},{name:'Square',symbol:'■',color:'#ffb66d'}];
-        shapeTarget = shapes[Math.floor(Math.random()*shapes.length)].name;
-        prompt.textContent = `Find the ${shapeTarget.toLowerCase()}!`;
-        instructions.textContent = 'Tap the matching shape.';
-        shapes.forEach(s => {
-          const b = document.createElement('button');
-          b.style.cssText = `background:#fff;min-height:110px;border-radius:24px;box-shadow:0 6px 16px #e6e0f6;color:${s.color};font-size:56px`;
-          b.textContent = s.symbol;
-          b.setAttribute('aria-label',s.name);
-          b.onclick = () => {
-            if(s.name === shapeTarget) feedback.textContent = 'Wonderful matching! ⭐';
-            else feedback.textContent = 'Good try! Find the '+shapeTarget.toLowerCase()+'. 😊';
-          };
-          area.appendChild(b);
-        });
-        area.style.gridTemplateColumns = 'repeat(3,1fr)';
-      }
-    }
-  </script>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button class="nav-item active" data-screen="home" onclick="goTo('home')"><span class="nav-icon">⌂</span><span>Home</span></button>
+  <button class="nav-item" data-screen="learn" onclick="goTo('learn')"><span class="nav-icon">🎓</span><span>Learn</span></button>
+  <button class="nav-item" data-screen="games" onclick="goTo('games')"><span class="nav-icon">🎮</span><span>Games</span></button>
+  <button class="nav-item" data-screen="rewards" onclick="goTo('rewards')"><span class="nav-icon">★</span><span>Rewards</span></button>
+  <button class="nav-item" data-screen="profile" onclick="goTo('profile')"><span class="nav-icon">☺</span><span>Profile</span></button>
+</nav>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const screens=["home","learn","games","rewards","profile","play"];
+const freshProgress={stars:0,activities:0,daily:0,completedGames:[],bubbleComplete:false,colorComplete:false,shapeComplete:false};
+let progress=loadProgress(),currentGame="bubble",bubbleCount=0,roundComplete=false,colorTarget="",shapeTarget="",toastTimer;
+function loadProgress(){try{const saved=JSON.parse(localStorage.getItem("bubblyPlayProgress"));return saved?{...freshProgress,...saved}: {...freshProgress,completedGames:[]};}catch(e){return {...freshProgress,completedGames:[]};}}
+function saveProgress(){try{localStorage.setItem("bubblyPlayProgress",JSON.stringify(progress));}catch(e){}}
+function goTo(id){if(!screens.includes(id))return;document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));document.querySelectorAll(".nav-item").forEach(b=>{let active=b.dataset.screen===id;b.classList.toggle("active",active);if(active)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});if(id==="rewards")updateRewards();window.scrollTo({top:0,behavior:"auto"});}
+function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),3200);}
+function lesson(topic){const lessons={stories:["Story Time 📚","Once upon a time, a little lion went exploring in the jungle! What animals do you know? Ask your grown-up to tell you a story together."],math:["Counting Fun 🔢","Let's count together: one, two, three! Can you count three toys with your grown-up?"],science:["Little Scientists 🧪","Can you find something blue, something green, and something yellow? Explore safely with your grown-up."],arts:["Creative Arts 🎨","Let's make something colorful! Can you find red, yellow, and blue crayons and draw your favorite thing?"]};if(!lessons[topic])return;toast(lessons[topic][0]+": "+lessons[topic][1]);progress.activities++;progress.stars++;progress.daily=Math.min(5,progress.daily+1);saveProgress();updateHome();updateRewards();}
+function startGame(game){if(!["bubble","color","shape"].includes(game))return;currentGame=game;goTo("play");resetGame();}
+function resetGame(){const area=document.getElementById("play-area"),feedback=document.getElementById("feedback"),dots=document.getElementById("dots");area.replaceChildren();dots.replaceChildren();feedback.textContent="";roundComplete=false;bubbleCount=0;
+if(currentGame==="bubble"){document.getElementById("play-title").textContent="Bubble Pop";document.getElementById("prompt-title").textContent="Pop the bubbles! 🫧";document.getElementById("instructions").textContent="Tap every bubble. Take your time!";area.style.gridTemplateColumns="repeat(2,minmax(0,1fr))";const colors=["#ffacd5","#ffd76e","#84dff2","#b7a2ff","#80dfb4","#ffbd99","#8ac7ff","#f8a4d2"];colors.forEach((color,i)=>{const b=document.createElement("button");b.className="choice bubble-choice";b.textContent="🫧";b.style.background=`linear-gradient(145deg,#fff,${color})`;b.setAttribute("aria-label","Pop bubble "+(i+1));b.addEventListener("click",()=>{if(b.disabled||roundComplete)return;b.disabled=true;b.textContent="✨";b.style.background="#f4edff";bubbleCount++;updateDots(bubbleCount,8);if(bubbleCount===8){roundComplete=true;progress.bubbleComplete=true;finishGame("bubble","Amazing! You popped every bubble! ⭐");}else feedback.textContent="Pop! Great job! ✨";});area.appendChild(b);});updateDots(0,8);}
+else if(currentGame==="color"){document.getElementById("play-title").textContent="Color Match";document.getElementById("instructions").textContent="Look at the color, then find its match.";const choices=[{name:"Purple",color:"#a38aff",emoji:"💜"},{name:"Green",color:"#83dfad",emoji:"💚"},{name:"Orange",color:"#ffc17a",emoji:"🧡"},{name:"Blue",color:"#83d4ff",emoji:"💙"}];colorTarget=choices[Math.floor(Math.random()*choices.length)].name;const target=choices.find(c=>c.name===colorTarget);document.getElementById("prompt-title").textContent="Find "+colorTarget.toLowerCase()+"! "+target.emoji;area.style.gridTemplateColumns="repeat(2,minmax(0,1fr))";choices.forEach(c=>{const b=document.createElement("button");b.className="choice color-choice";b.style.background=`linear-gradient(145deg,#fff,${c.color})`;b.innerHTML=`<span style="font-size:37px">${c.emoji}</span><span>${c.name}</span>`;b.addEventListener("click",()=>{if(roundComplete)return;if(c.name===colorTarget){roundComplete=true;progress.colorComplete=true;finishGame("color","Wonderful! You found "+colorTarget.toLowerCase()+"! 🌟");}else feedback.textContent="Good try! Look for "+colorTarget.toLowerCase()+". 💜";});area.appendChild(b);});}
+else{document.getElementById("play-title").textContent="Shape Sorter";document.getElementById("instructions").textContent="Look at the shape and find the matching one.";const shapes=[{name:"Circle",symbol:"●",color:"#ff91bd"},{name:"Triangle",symbol:"▲",color:"#66baff"},{name:"Square",symbol:"■",color:"#5ac9a0"}];shapeTarget=shapes[Math.floor(Math.random()*shapes.length)].name;document.getElementById("prompt-title").textContent="Find the "+shapeTarget.toLowerCase()+"!";area.style.gridTemplateColumns="repeat(3,minmax(0,1fr))";shapes.forEach(s=>{const b=document.createElement("button");b.className="choice shape-choice";b.style.color=s.color;b.innerHTML=`<span>${s.symbol}</span><span style="font-size:12px;color:#625b7d">${s.name}</span>`;b.setAttribute("aria-label",s.name);b.addEventListener("click",()=>{if(roundComplete)return;if(s.name===shapeTarget){roundComplete=true;progress.shapeComplete=true;finishGame("shape","Wonderful matching! You found the "+shapeTarget.toLowerCase()+"! ⭐");}else feedback.textContent="Nice try! Find the "+shapeTarget.toLowerCase()+". 😊";});area.appendChild(b);});}}
+function updateDots(done,total){const el=document.getElementById("dots");el.replaceChildren();for(let i=0;i<total;i++){const d=document.createElement("span");if(i<done)d.classList.add("done");el.appendChild(d);}}
+function finishGame(game,message){if(!progress.completedGames.includes(game)){progress.completedGames.push(game);progress.stars+=game==="bubble"?2:1;progress.activities++;progress.daily=Math.min(5,progress.daily+1);}document.getElementById("feedback").textContent=message;updateDots(game==="bubble"?8:1,game==="bubble"?8:1);saveProgress();updateHome();updateRewards();}
+function updateHome(){document.getElementById("daily-progress").style.width=(Math.min(5,progress.daily)/5*100)+"%";document.getElementById("daily-label").textContent=Math.min(5,progress.daily)+" / 5 activities";document.getElementById("story-progress").style.width=(Math.min(5,progress.activities)/5*100)+"%";}
+function updateRewards(){document.getElementById("reward-stars").textContent=progress.stars;document.getElementById("reward-lessons").textContent=progress.activities;const earned=[];if(progress.activities>=1)earned.push("first");if(progress.stars>=5)earned.push("stars");if(progress.completedGames.length>=3)earned.push("games");if(progress.colorComplete)earned.push("colors");if(progress.shapeComplete)earned.push("shapes");if(progress.bubbleComplete)earned.push("bubbles");document.getElementById("reward-badges").textContent=earned.length;["first","stars","games","colors","shapes","bubbles"].forEach(n=>{const el=document.getElementById("badge-"+n);if(el)el.classList.toggle("locked",!earned.includes(n));});}
+updateHome();updateRewards();
+</script>
 </body>
 </html>
