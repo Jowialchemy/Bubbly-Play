@@ -1,211 +1,256 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#e9e5ff">
-  <meta name="description" content="Bubbly Play — little games, big smiles!">
-  <title>Bubbly Play — Little games. Big smiles!</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#eee9ff">
+<meta name="description" content="Bubbly Play — little games, big smiles!">
+<title>Bubbly Play — Little games. Big smiles!</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
 </head>
 <body>
-  <main class="app">
+<div class="app">
 
-    <header class="brandbar">
-      <button class="circle-btn" id="menuBtn" aria-label="Menu">☰</button>
-      <button class="brand" data-go="home" aria-label="Bubbly Play home">
-        <span class="brand-bubble">🫧</span>
-        <span>Bubbly <b>Play</b></span>
-      </button>
-      <button class="circle-btn" id="searchBtn" aria-label="Find a game">⌕</button>
-    </header>
+<header class="topbar">
+<a class="brand" href="#" data-go="home">
+<span class="bubbles">🫧</span>
+<span>Bubbly <b>Play</b></span>
+</a>
+<button id="soundBtn" class="icon-btn" aria-label="Toggle sound">🔊</button>
+</header>
 
-    <!-- HOME -->
-    <section class="screen active" id="home">
-      <div class="home-hero">
-        <div class="hero-copy">
-          <div class="hello">Hello, little star! 👋</div>
-          <h1>Ready to learn something awesome?</h1>
-          <p>Little games. Big smiles! ✨</p>
-          <span class="hero-caption">Explore, discover, and grow every day.</span>
-        </div>
-        <div class="hero-mascot" aria-label="Friendly little learner">👧🏻<span>✨</span></div>
-        <div class="floating-dot dot-one"></div>
-        <div class="floating-dot dot-two"></div>
-      </div>
+<main>
 
-      <div class="section-heading">
-        <h2>Learning Categories</h2>
-        <button class="text-btn" data-go="learn">See all ›</button>
-      </div>
-      <div class="category-grid">
-        <button class="category" data-go="learn"><span class="category-art purple">📚</span><b>Stories</b></button>
-        <button class="category" data-go="learn"><span class="category-art peach">🔢</span><b>Math</b></button>
-        <button class="category" data-go="learn"><span class="category-art mint">🧪</span><b>Science</b></button>
-        <button class="category" data-go="learn"><span class="category-art pink">🎨</span><b>Arts</b></button>
-      </div>
+<section class="screen active" id="home">
+<div class="hero">
+<div class="hero-copy">
+<p class="eyebrow">HELLO, LITTLE STAR! 👋</p>
+<h1>Ready to learn something <em>awesome?</em></h1>
+<p class="bigline">Little games. Big smiles! ✨</p>
+<p class="muted">Explore, discover, and grow every day.</p>
+<button class="primary" data-go="games">Let's play <b>→</b></button>
+</div>
+<div class="hero-art" aria-hidden="true">
+<span class="cloud c1">☁️</span>
+<span class="rainbow">🌈</span>
+<span class="bear">🐻</span>
+<span class="spark s1">⭐</span>
+<span class="spark s2">💜</span>
+</div>
+</div>
 
-      <div class="daily-card">
-        <div class="daily-copy">
-          <h3>⭐ Daily Goal</h3>
-          <p>Keep it up!<br>Every little step counts.</p>
-          <div class="daily-progress"><span id="dailyBar"></span></div>
-          <small id="dailyText">0 / 5 activities</small>
-        </div>
-        <div class="daily-star">🌟</div>
-      </div>
+<div class="section-head">
+<div>
+<p class="eyebrow">LET'S DISCOVER</p>
+<h2>Learning categories</h2>
+</div>
+<button class="text-btn" data-go="learn">See all ›</button>
+</div>
 
-      <div class="section-heading">
-        <h2>Continue Learning</h2>
-        <button class="text-btn" data-go="learn">See all ›</button>
-      </div>
-      <article class="continue-card">
-        <div class="story-art">🦁</div>
-        <div class="card-copy">
-          <h3>The Jungle Adventure</h3>
-          <p>Story time · Little explorers</p>
-          <div class="mini-progress"><span style="width:60%"></span></div>
-        </div>
-        <button class="next-btn" id="storyBtn" aria-label="Continue story">▶</button>
-      </article>
+<div class="categories">
+<button class="category lilac" data-category="Stories"><span>📚</span><b>Stories</b><small>Read & imagine</small></button>
+<button class="category peach" data-category="Math"><span>🔢</span><b>Math</b><small>Count & explore</small></button>
+<button class="category mint" data-category="Science"><span>🧪</span><b>Science</b><small>Discover</small></button>
+<button class="category yellow" data-category="Arts"><span>🎨</span><b>Arts</b><small>Make & create</small></button>
+</div>
 
-      <div class="section-heading">
-        <h2>Recommended for You</h2>
-        <button class="text-btn" data-go="games">See all ›</button>
-      </div>
-      <div class="recommend-grid">
-        <button class="recommend-card" data-game="color">
-          <div class="recommend-art space">🚀 ⭐</div>
-          <b>Space Explorer</b><small>Colors & discovery</small>
-        </button>
-        <button class="recommend-card" data-game="shape">
-          <div class="recommend-art jungle">🦕 🌴</div>
-          <b>Dino World</b><small>Shapes & fun</small>
-        </button>
-      </div>
-    </section>
+<div class="daily">
+<div class="daily-icon">🌟</div>
+<div class="daily-body">
+<p class="eyebrow">YOUR LITTLE WINS</p>
+<h2>Daily goal</h2>
+<p class="muted">Keep it up! Every little step counts.</p>
+<div class="track"><span id="dailyBar"></span></div>
+<small><b id="dailyCount">0</b> / 5 activities completed</small>
+</div>
+</div>
 
-    <!-- LEARN -->
-    <section class="screen" id="learn">
-      <div class="page-heading"><span class="heading-emoji">🌈</span><div><h1>Let's Learn!</h1><p>Small steps, big discoveries.</p></div></div>
-      <div class="feature-banner learn-banner">
-        <div><h2>Small Steps<br>Big Learning!</h2><p>Explore, discover,<br>and grow!</p></div>
-        <span class="banner-mascot">🦉📖</span>
-      </div>
-      <div class="learning-list">
-        <button class="learning-card" id="storiesBtn"><span class="learning-art lilac">📚</span><span class="learning-copy"><b>Stories</b><small>Read and imagine</small><span class="mini-progress"><span style="width:60%"></span></span></span><span class="next-btn">›</span></button>
-        <button class="learning-card" id="mathBtn"><span class="learning-art peach">🔢</span><span class="learning-copy"><b>Math</b><small>Count and solve</small><span class="mini-progress"><span style="width:45%"></span></span></span><span class="next-btn">›</span></button>
-        <button class="learning-card" id="scienceBtn"><span class="learning-art mint">🧪</span><span class="learning-copy"><b>Science</b><small>Explore and experiment</small><span class="mini-progress"><span style="width:35%"></span></span></span><span class="next-btn">›</span></button>
-        <button class="learning-card" id="artsBtn"><span class="learning-art pink">🎨</span><span class="learning-copy"><b>Arts</b><small>Create and be creative</small><span class="mini-progress"><span style="width:50%"></span></span></span><span class="next-btn">›</span></button>
-      </div>
-    </section>
+<div class="section-head">
+<div>
+<p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p>
+<h2>Continue learning</h2>
+</div>
+<button class="text-btn" data-go="learn">See all ›</button>
+</div>
 
-    <!-- GAMES -->
-    <section class="screen" id="games">
-      <div class="page-heading"><span class="heading-emoji">🎮</span><div><h1>Games</h1><p>Play, discover, and smile!</p></div></div>
-      <div class="feature-banner games-banner">
-        <div><h2>Play & Learn!</h2><p>Fun games for<br>little learners!</p></div>
-        <span class="banner-mascot">🫧</span>
-      </div>
-      <div class="game-list">
-        <button class="game-card" data-game="bubble">
-          <span class="game-art bubble-art"><span>🫧</span>😊</span>
-          <span class="game-copy"><b>Bubble Pop</b><small>Tap the bubbles!</small><span class="mini-progress"><span style="width:35%"></span></span></span><span class="next-btn">›</span>
-        </button>
-        <button class="game-card" data-game="color">
-          <span class="game-art color-art"><span>🔴</span><span>🟡</span><span>🔵</span><span>🟢</span></span>
-          <span class="game-copy"><b>Color Match</b><small>Find the same color!</small><span class="mini-progress"><span style="width:45%"></span></span></span><span class="next-btn">›</span>
-        </button>
-        <button class="game-card" data-game="shape">
-          <span class="game-art shape-art"><span>🔺</span><span>⭐</span><span>🟦</span><span>🔵</span></span>
-          <span class="game-copy"><b>Shape Sorter</b><small>Find where shapes go!</small><span class="mini-progress"><span style="width:25%"></span></span></span><span class="next-btn">›</span>
-        </button>
-      </div>
-      <div class="safe-note">💜 Made for little learners — no ads, purchases, or outside links.</div>
-    </section>
+<button class="continue" data-game="color">
+<span class="fox">🦊</span>
+<span>
+<small class="tag">JUST FOR YOU</small>
+<b>Colors all around us</b>
+<small class="muted">Find colors in your world!</small>
+</span>
+<span class="play-circle">▶</span>
+</button>
 
-    <!-- REWARDS -->
-    <section class="screen" id="rewards">
-      <div class="page-heading"><span class="heading-emoji">🏆</span><div><h1>Rewards</h1><p>Every little try is wonderful!</p></div></div>
-      <div class="feature-banner rewards-banner">
-        <div><h2>You're Amazing!</h2><p>Keep learning and<br>collect rewards!</p></div>
-        <span class="banner-mascot">⭐</span>
-      </div>
-      <h3 class="section-title">Your Progress</h3>
-      <div class="stats-grid">
-        <div class="stat-card"><small>Activities</small><strong id="statActivities">0</strong><span>📚</span></div>
-        <div class="stat-card"><small>Stars Earned</small><strong id="statStars">0</strong><span>⭐</span></div>
-        <div class="stat-card"><small>Badges</small><strong id="statBadges">0</strong><span>🏅</span></div>
-      </div>
-      <h3 class="section-title">Your Badges</h3>
-      <div class="badge-grid">
-        <div class="badge-card"><span>🐾</span><small>First Steps</small></div>
-        <div class="badge-card"><span>🔢</span><small>Math Genius</small></div>
-        <div class="badge-card"><span>🧪</span><small>Science Star</small></div>
-        <div class="badge-card"><span>📖</span><small>Story Lover</small></div>
-      </div>
-      <div class="challenge-card"><span class="challenge-art">🐻</span><div><b>Little Star Challenge</b><p>Play and discover something new!</p><div class="mini-progress"><span id="challengeBar" style="width:0%"></span></div></div><span>🎁</span></div>
-    </section>
+<div class="section-head">
+<div>
+<p class="eyebrow">PLAY AND LEARN</p>
+<h2>Little games</h2>
+</div>
+<button class="text-btn" data-go="games">See all ›</button>
+</div>
 
-    <!-- PROFILE -->
-    <section class="screen" id="profile">
-      <div class="page-heading"><span class="heading-emoji">👧🏻</span><div><h1>My Profile</h1><p>A little star is growing!</p></div></div>
-      <div class="profile-card">
-        <div class="avatar-ring">👧🏻</div>
-        <h2>Little Star ⭐</h2>
-        <p>Keep being awesome!</p>
-        <div class="profile-stats">
-          <div><span>⭐</span><b id="profileStars">0</b><small>Stars</small></div>
-          <div><span>📚</span><b id="profileActivities">0</b><small>Activities</small></div>
-          <div><span>🏅</span><b id="profileBadges">0</b><small>Badges</small></div>
-        </div>
-      </div>
-      <h3 class="section-title">My Favorites</h3>
-      <div class="favorites-grid">
-        <button data-game="bubble"><span>🫧</span><b>Bubble Pop</b></button>
-        <button data-game="color"><span>🎨</span><b>Colors</b></button>
-        <button data-game="shape"><span>🔺</span><b>Shapes</b></button>
-      </div>
-      <div class="feature-banner profile-banner"><span class="banner-mascot">🫧</span><div><h2>You're brilliant!</h2><p>Keep exploring. 💗</p></div></div>
-      <div class="safe-note">A safe, happy place to learn through play. 💜</div>
-    </section>
+<div class="mini-games">
+<button data-game="bubble" class="mini bubble-card"><span>🫧</span><b>Bubble Pop</b><small>Pop the bubbles</small></button>
+<button data-game="color" class="mini color-card"><span>🎨</span><b>Color Match</b><small>Find the color</small></button>
+<button data-game="shape" class="mini shape-card"><span>🔺</span><b>Shape Sorter</b><small>Fit the shapes</small></button>
+</div>
+</section>
 
-    <!-- GAME PLAY -->
-    <section class="screen" id="play">
-      <div class="play-topbar">
-        <button class="circle-btn" id="backGames" aria-label="Back to games">‹</button>
-        <h2 id="playTitle">Bubble Pop</h2>
-        <button class="circle-btn pause-btn" id="pauseBtn" aria-label="Pause game">Ⅱ</button>
-      </div>
-      <div class="game-scene" id="gameScene">
-        <div class="scene-cloud cloud-left"></div>
-        <div class="scene-cloud cloud-right"></div>
-        <div class="scene-sun">☀️</div>
-        <div class="scene-message" id="playPrompt">Tap the bubbles!</div>
-        <div class="scene-subtitle" id="playInstructions">Pop as many as you like.</div>
-        <div id="playArea" class="play-area"></div>
-        <div class="scene-feedback" id="playFeedback" aria-live="polite"></div>
-        <div class="game-hud">
-          <div class="score-pill">⭐ <b id="gameScore">0</b></div>
-          <div class="score-progress"><span id="gameProgress"></span></div>
-          <button class="restart-btn" id="restartBtn" aria-label="Play again">↻</button>
-        </div>
-      </div>
-      <div class="play-encouragement" id="playEncouragement">You're doing great! Every try is a win. 💜</div>
-    </section>
+<section class="screen" id="learn">
+<div class="page-title">
+<p class="eyebrow">GROW A LITTLE EVERY DAY</p>
+<h1>Let's learn! 🌈</h1>
+<p class="muted">Curious minds are wonderful minds.</p>
+</div>
 
-    <!-- FIXED BOTTOM NAVIGATION -->
-    <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="nav-item active" data-nav="home"><span>⌂</span><small>Home</small></button>
-      <button class="nav-item" data-nav="learn"><span>🎓</span><small>Learn</small></button>
-      <button class="nav-item" data-nav="games"><span>🎮</span><small>Games</small></button>
-      <button class="nav-item" data-nav="rewards"><span>★</span><small>Rewards</small></button>
-      <button class="nav-item" data-nav="profile"><span>☺</span><small>Profile</small></button>
-    </nav>
-  </main>
+<button class="story-card" id="storyBtn">
+<span>📖</span>
+<span><b>Story time</b><small class="muted">Read a tiny story, imagine a big adventure.</small></span>
+<b>›</b>
+</button>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="script.js"></script>
+<div class="categories learn-cats">
+<button class="category lilac" data-category="Stories"><span>📚</span><b>Stories</b><small>Read & imagine</small></button>
+<button class="category peach" data-category="Math"><span>🔢</span><b>Math</b><small>Count & explore</small></button>
+<button class="category mint" data-category="Science"><span>🧪</span><b>Science</b><small>Discover</small></button>
+<button class="category yellow" data-category="Arts"><span>🎨</span><b>Arts</b><small>Make & create</small></button>
+</div>
+
+<div class="tip">💡 <span><b>Grown-up tip</b><br>Celebrate trying, play together, and take breaks whenever your little learner needs one.</span></div>
+</section>
+
+<section class="screen" id="games">
+<div class="page-title">
+<p class="eyebrow">READY, SET, PLAY!</p>
+<h1>Choose a game 🎮</h1>
+<p class="muted">Every try is something to celebrate.</p>
+</div>
+
+<button class="game-tile bubble-tile" data-game="bubble">
+<span>🫧</span>
+<span><b>Bubble Pop</b><small>Tap the bubbles as they float!</small><i>✨ Easy · Tap to play</i></span>
+<strong>→</strong>
+</button>
+
+<button class="game-tile color-tile" data-game="color">
+<span>🎨</span>
+<span><b>Color Match</b><small>Find the color that matches.</small><i>🌈 Easy · Learn colors</i></span>
+<strong>→</strong>
+</button>
+
+<button class="game-tile shape-tile" data-game="shape">
+<span>🔺</span>
+<span><b>Shape Sorter</b><small>Put each shape in its home.</small><i>🧩 Easy · Drag or tap</i></span>
+<strong>→</strong>
+</button>
+
+<p class="gentle">💜 No timers, no pressure — just happy learning.</p>
+</section>
+
+<section class="screen" id="rewards">
+<div class="page-title">
+<p class="eyebrow">LOOK AT YOU GO!</p>
+<h1>Your rewards ⭐</h1>
+<p class="muted">Every game earns a little celebration.</p>
+</div>
+
+<div class="reward">
+<span>🏆</span>
+<p class="eyebrow">YOUR STAR COLLECTION</p>
+<h2 id="starTotal">0 stars</h2>
+<p class="muted">Keep exploring to collect more stars.</p>
+</div>
+
+<div class="stats">
+<div>🎯<b id="activityTotal">0</b><small>Activities played</small></div>
+<div>🌟<b id="bestTotal">0</b><small>Best game score</small></div>
+</div>
+
+<button class="primary centered" data-go="games">Earn more stars →</button>
+</section>
+
+<section class="screen" id="profile">
+<div class="page-title">
+<p class="eyebrow">MY LITTLE SPACE</p>
+<h1>Hello, superstar! 😊</h1>
+<p class="muted">A happy place to learn at your own pace.</p>
+</div>
+
+<div class="profile-card">
+<span>🐻</span>
+<h2>Little Star</h2>
+<p class="muted">Curious learner · Big imagination</p>
+<div class="stats">
+<div><b id="profileStars">0</b><small>Stars</small></div>
+<div><b id="profileActs">0</b><small>Activities</small></div>
+</div>
+</div>
+
+<div class="tip">🧸 <span><b>For grown-ups</b><br>Bubbly Play is made for gentle, playful learning. Stay nearby and enjoy the games together.</span></div>
+
+<button id="resetBtn" class="secondary centered">Reset play progress</button>
+</section>
+
+<section class="screen play-screen" id="play">
+<div class="play-top">
+<button id="backBtn" class="secondary">← Games</button>
+<span class="score">⭐ <b id="score">0</b></span>
+</div>
+
+<div class="play-heading">
+<p class="eyebrow">LET'S PLAY</p>
+<h1 id="gameTitle">Bubble Pop!</h1>
+<p id="prompt">Tap the bubbles!</p>
+<small id="instructions" class="muted">Pop five bubbles to begin.</small>
+</div>
+
+<div class="scene" id="scene">
+<div id="playArea"></div>
+</div>
+
+<p class="feedback" id="feedback">You're doing great! 💜</p>
+
+<div class="progress-row">
+<div class="track"><span id="gameBar"></span></div>
+<small id="roundText">0 of 5</small>
+</div>
+
+<div class="actions">
+<button id="pauseBtn" class="secondary">Pause</button>
+<button id="restartBtn" class="primary">Play again ↻</button>
+</div>
+
+<p class="muted encouragement" id="encouragement">Every try is a little win!</p>
+</section>
+
+</main>
+
+<nav class="bottom-nav" aria-label="Main navigation">
+<button class="nav-item active" data-nav="home"><span>⌂</span><small>Home</small></button>
+<button class="nav-item" data-nav="learn"><span>🎓</span><small>Learn</small></button>
+<button class="nav-item" data-nav="games"><span>🎮</span><small>Games</small></button>
+<button class="nav-item" data-nav="rewards"><span>★</span><small>Rewards</small></button>
+<button class="nav-item" data-nav="profile"><span>☺</span><small>Profile</small></button>
+</nav>
+
+<div class="toast" id="toast" role="status"></div>
+
+<div class="modal-backdrop" id="modal" hidden>
+<div class="modal">
+<button id="closeModal" aria-label="Close">×</button>
+<div>🐰🌼</div>
+<p class="eyebrow">A LITTLE STORY</p>
+<h2>Bunny's Bright Day</h2>
+<p>Bunny hopped into the garden and found a yellow flower. “Hello, sunshine!” Bunny smiled. A tiny bee buzzed by, and they shared the warm morning together. Bunny learned that small things can bring big happiness.</p>
+<button class="primary" id="storyDone">Lovely story! ✨</button>
+</div>
+</div>
+
+<footer>Made with 💜 for little learners</footer>
+
+</div>
 </body>
 </html>
