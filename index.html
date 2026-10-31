@@ -1,256 +1,925 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#eee9ff">
-<meta name="description" content="Bubbly Play — little games, big smiles!">
-<title>Bubbly Play — Little games. Big smiles!</title>
-<link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubbly Play — Little games. Big smiles!</title>
+  <style>
+    :root {
+      --purple: #8b6cf6;
+      --purple-dark: #7051df;
+      --lavender: #f1edff;
+      --pink: #ffb8d2;
+      --yellow: #ffe58a;
+      --blue: #bde8ff;
+      --green: #b9f2d0;
+      --text: #332b53;
+      --muted: #81799d;
+      --white: #fff;
+      --shadow: 0 8px 24px rgba(99, 75, 160, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background: #f8f6ff;
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: none;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: auto;
+      padding: 18px 16px 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--lavender);
+      font-size: 28px;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      color: var(--purple-dark);
+    }
+
+    .brand p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .star-pill {
+      background: white;
+      border-radius: 30px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      font-weight: bold;
+      color: #d99a00;
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #e9e2ff, #fff0f7);
+      border-radius: 28px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+
+    .hero h2 {
+      font-size: clamp(24px, 5vw, 34px);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      color: #756b98;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .hero-character {
+      font-size: clamp(70px, 16vw, 115px);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .primary-btn {
+      background: var(--purple);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 16px;
+      font-weight: bold;
+      box-shadow: 0 5px 0 #6c4ed1;
+    }
+
+    .primary-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #6c4ed1;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 25px 2px 14px;
+    }
+
+    .section-heading h2 {
+      font-size: 21px;
+    }
+
+    .section-heading span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progress-card {
+      background: white;
+      border-radius: 22px;
+      padding: 17px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .progress-track {
+      height: 12px;
+      border-radius: 20px;
+      background: #eee9ff;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9c83ff, #ffacd0);
+      border-radius: inherit;
+      transition: width .4s;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 22px;
+      padding: 17px;
+      box-shadow: var(--shadow);
+      text-align: left;
+      transition: transform .2s;
+      min-height: 170px;
+    }
+
+    .game-card:active {
+      transform: scale(.97);
+    }
+
+    .game-art {
+      height: 75px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      font-size: 43px;
+      margin-bottom: 12px;
+    }
+
+    .game-card h3 {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .game-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .pink { background: #ffe4ef; }
+    .blue { background: #e0f4ff; }
+    .yellow { background: #fff4c9; }
+    .green { background: #e0fae9; }
+    .lavender { background: #eee8ff; }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: appear .25s ease;
+    }
+
+    .back-btn {
+      background: white;
+      color: var(--purple-dark);
+      padding: 10px 15px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      font-weight: bold;
+    }
+
+    .game-panel {
+      background: white;
+      border-radius: 26px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .game-panel h2 {
+      margin-bottom: 8px;
+    }
+
+    .game-instruction {
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .bubble-area {
+      min-height: 300px;
+      background: #f1edff;
+      border-radius: 22px;
+      position: relative;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 25px;
+      box-shadow: inset -5px -7px 12px rgba(90, 70, 150, .12);
+      animation: bob 2s ease-in-out infinite alternate;
+      user-select: none;
+    }
+
+    .bubble:active {
+      transform: scale(.8);
+    }
+
+    .choice-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .color-choice {
+      width: 65px;
+      height: 65px;
+      border-radius: 20px;
+      border: 4px solid white;
+      box-shadow: var(--shadow);
+    }
+
+    .shape-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    .shape-slot {
+      height: 90px;
+      border: 3px dashed #c9baff;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      font-size: 42px;
+      background: #faf8ff;
+    }
+
+    .shape-slot.filled {
+      border-style: solid;
+      background: #e8fff0;
+    }
+
+    .shape-piece {
+      width: 70px;
+      height: 70px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      background: #fff1c9;
+      box-shadow: var(--shadow);
+      touch-action: manipulation;
+    }
+
+    .shape-piece:active {
+      transform: scale(.92);
+    }
+
+    .shape-pieces {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .feedback {
+      min-height: 28px;
+      font-weight: bold;
+      color: var(--purple-dark);
+      margin: 12px 0;
+    }
+
+    .learn-list, .reward-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .info-icon {
+      font-size: 35px;
+      background: var(--lavender);
+      border-radius: 15px;
+      padding: 10px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .profile-card {
+      text-align: center;
+      background: white;
+      border-radius: 25px;
+      padding: 28px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-avatar {
+      font-size: 75px;
+      margin-bottom: 10px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 10;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 -5px 25px rgba(99, 75, 160, .10);
+      display: flex;
+      justify-content: center;
+      padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+
+    .nav-item {
+      background: transparent;
+      color: #a29ab9;
+      display: grid;
+      justify-items: center;
+      gap: 4px;
+      padding: 5px 2px;
+      font-size: 10px;
+      font-weight: bold;
+      border-radius: 14px;
+    }
+
+    .nav-item span {
+      font-size: 21px;
+    }
+
+    .nav-item.active {
+      color: var(--purple-dark);
+      background: #f0ebff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes bob {
+      from { transform: translateY(0) rotate(-5deg); }
+      to { transform: translateY(-8px) rotate(5deg); }
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (min-width: 650px) {
+      .game-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .hero {
+        padding: 32px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-left: 11px;
+        padding-right: 11px;
+      }
+
+      .game-card {
+        padding: 12px;
+      }
+
+      .hero {
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="app">
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">🫧</div>
+        <div>
+          <h1>Bubbly Play</h1>
+          <p>Little games. Big smiles!</p>
+        </div>
+      </div>
+      <div class="star-pill">⭐ <span id="starCount">0</span></div>
+    </header>
 
-<header class="topbar">
-<a class="brand" href="#" data-go="home">
-<span class="bubbles">🫧</span>
-<span>Bubbly <b>Play</b></span>
-</a>
-<button id="soundBtn" class="icon-btn" aria-label="Toggle sound">🔊</button>
-</header>
+    <!-- HOME -->
+    <section id="homeScreen" class="screen active">
+      <div class="hero">
+        <div>
+          <h2>Ready to<br>play and learn?</h2>
+          <p>Explore, discover and have fun every day!</p>
+          <button class="primary-btn" onclick="showScreen('gamesScreen')">Let's Play! 🎮</button>
+        </div>
+        <div class="hero-character">🐻</div>
+      </div>
 
-<main>
+      <div class="section-heading">
+        <h2>My Learning Journey</h2>
+        <span id="progressText">0 stars earned</span>
+      </div>
 
-<section class="screen active" id="home">
-<div class="hero">
-<div class="hero-copy">
-<p class="eyebrow">HELLO, LITTLE STAR! 👋</p>
-<h1>Ready to learn something <em>awesome?</em></h1>
-<p class="bigline">Little games. Big smiles! ✨</p>
-<p class="muted">Explore, discover, and grow every day.</p>
-<button class="primary" data-go="games">Let's play <b>→</b></button>
-</div>
-<div class="hero-art" aria-hidden="true">
-<span class="cloud c1">☁️</span>
-<span class="rainbow">🌈</span>
-<span class="bear">🐻</span>
-<span class="spark s1">⭐</span>
-<span class="spark s2">💜</span>
-</div>
-</div>
+      <div class="progress-card">
+        <div class="progress-top">
+          <span>⭐ Star progress</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
 
-<div class="section-head">
-<div>
-<p class="eyebrow">LET'S DISCOVER</p>
-<h2>Learning categories</h2>
-</div>
-<button class="text-btn" data-go="learn">See all ›</button>
-</div>
+      <div class="section-heading">
+        <h2>Playtime Picks</h2>
+        <span>Choose a game</span>
+      </div>
 
-<div class="categories">
-<button class="category lilac" data-category="Stories"><span>📚</span><b>Stories</b><small>Read & imagine</small></button>
-<button class="category peach" data-category="Math"><span>🔢</span><b>Math</b><small>Count & explore</small></button>
-<button class="category mint" data-category="Science"><span>🧪</span><b>Science</b><small>Discover</small></button>
-<button class="category yellow" data-category="Arts"><span>🎨</span><b>Arts</b><small>Make & create</small></button>
-</div>
+      <div class="game-grid">
+        <button class="game-card" onclick="startGame('bubble')">
+          <div class="game-art pink">🫧</div>
+          <h3>Bubble Pop</h3>
+          <p>Pop the floating bubbles!</p>
+        </button>
 
-<div class="daily">
-<div class="daily-icon">🌟</div>
-<div class="daily-body">
-<p class="eyebrow">YOUR LITTLE WINS</p>
-<h2>Daily goal</h2>
-<p class="muted">Keep it up! Every little step counts.</p>
-<div class="track"><span id="dailyBar"></span></div>
-<small><b id="dailyCount">0</b> / 5 activities completed</small>
-</div>
-</div>
+        <button class="game-card" onclick="startGame('color')">
+          <div class="game-art blue">🎨</div>
+          <h3>Color Match</h3>
+          <p>Find the matching color.</p>
+        </button>
 
-<div class="section-head">
-<div>
-<p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p>
-<h2>Continue learning</h2>
-</div>
-<button class="text-btn" data-go="learn">See all ›</button>
-</div>
+        <button class="game-card" onclick="startGame('sort')">
+          <div class="game-art yellow">🔺</div>
+          <h3>Shape Sorter</h3>
+          <p>Match shapes and learn.</p>
+        </button>
 
-<button class="continue" data-game="color">
-<span class="fox">🦊</span>
-<span>
-<small class="tag">JUST FOR YOU</small>
-<b>Colors all around us</b>
-<small class="muted">Find colors in your world!</small>
-</span>
-<span class="play-circle">▶</span>
-</button>
+        <button class="game-card" onclick="startGame('fit')">
+          <div class="game-art green">🧩</div>
+          <h3>Shape Fit Puzzle</h3>
+          <p>Fit each shape into its place.</p>
+        </button>
+      </div>
+    </section>
 
-<div class="section-head">
-<div>
-<p class="eyebrow">PLAY AND LEARN</p>
-<h2>Little games</h2>
-</div>
-<button class="text-btn" data-go="games">See all ›</button>
-</div>
+    <!-- LEARN -->
+    <section id="learnScreen" class="screen">
+      <div class="section-heading">
+        <h2>Learn & Discover 📚</h2>
+        <span>Little steps</span>
+      </div>
 
-<div class="mini-games">
-<button data-game="bubble" class="mini bubble-card"><span>🫧</span><b>Bubble Pop</b><small>Pop the bubbles</small></button>
-<button data-game="color" class="mini color-card"><span>🎨</span><b>Color Match</b><small>Find the color</small></button>
-<button data-game="shape" class="mini shape-card"><span>🔺</span><b>Shape Sorter</b><small>Fit the shapes</small></button>
-</div>
-</section>
+      <div class="learn-list">
+        <div class="info-card">
+          <div class="info-icon">🔴</div>
+          <div><h3>Colors</h3><p>Red, blue, yellow and more!</p></div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🔺</div>
+          <div><h3>Shapes</h3><p>Circle, square, triangle and star.</p></div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🔢</div>
+          <div><h3>Numbers</h3><p>Let's count together: 1, 2, 3!</p></div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🐶</div>
+          <div><h3>Animals</h3><p>Meet our furry and feathered friends.</p></div>
+        </div>
+      </div>
+    </section>
 
-<section class="screen" id="learn">
-<div class="page-title">
-<p class="eyebrow">GROW A LITTLE EVERY DAY</p>
-<h1>Let's learn! 🌈</h1>
-<p class="muted">Curious minds are wonderful minds.</p>
-</div>
+    <!-- GAMES -->
+    <section id="gamesScreen" class="screen">
+      <div class="section-heading">
+        <h2>All Games 🎮</h2>
+        <span>Have fun!</span>
+      </div>
 
-<button class="story-card" id="storyBtn">
-<span>📖</span>
-<span><b>Story time</b><small class="muted">Read a tiny story, imagine a big adventure.</small></span>
-<b>›</b>
-</button>
+      <div class="game-grid">
+        <button class="game-card" onclick="startGame('bubble')">
+          <div class="game-art pink">🫧</div>
+          <h3>Bubble Pop</h3><p>Pop the bubbles.</p>
+        </button>
+        <button class="game-card" onclick="startGame('color')">
+          <div class="game-art blue">🎨</div>
+          <h3>Color Match</h3><p>Match the colors.</p>
+        </button>
+        <button class="game-card" onclick="startGame('sort')">
+          <div class="game-art yellow">🔺</div>
+          <h3>Shape Sorter</h3><p>Match the shapes.</p>
+        </button>
+        <button class="game-card" onclick="startGame('fit')">
+          <div class="game-art green">🧩</div>
+          <h3>Shape Fit Puzzle</h3><p>Fit shapes into the board.</p>
+        </button>
+      </div>
+    </section>
 
-<div class="categories learn-cats">
-<button class="category lilac" data-category="Stories"><span>📚</span><b>Stories</b><small>Read & imagine</small></button>
-<button class="category peach" data-category="Math"><span>🔢</span><b>Math</b><small>Count & explore</small></button>
-<button class="category mint" data-category="Science"><span>🧪</span><b>Science</b><small>Discover</small></button>
-<button class="category yellow" data-category="Arts"><span>🎨</span><b>Arts</b><small>Make & create</small></button>
-</div>
+    <!-- REWARDS -->
+    <section id="rewardsScreen" class="screen">
+      <div class="section-heading">
+        <h2>My Rewards 🏆</h2>
+        <span>You're doing great!</span>
+      </div>
 
-<div class="tip">💡 <span><b>Grown-up tip</b><br>Celebrate trying, play together, and take breaks whenever your little learner needs one.</span></div>
-</section>
+      <div class="reward-list">
+        <div class="info-card">
+          <div class="info-icon">⭐</div>
+          <div><h3 id="rewardStars">0 Stars</h3><p>Keep playing to earn more stars!</p></div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🎉</div>
+          <div><h3>Super Player</h3><p>Every game is a new adventure.</p></div>
+        </div>
+      </div>
+    </section>
 
-<section class="screen" id="games">
-<div class="page-title">
-<p class="eyebrow">READY, SET, PLAY!</p>
-<h1>Choose a game 🎮</h1>
-<p class="muted">Every try is something to celebrate.</p>
-</div>
+    <!-- PROFILE -->
+    <section id="profileScreen" class="screen">
+      <div class="section-heading">
+        <h2>My Profile 👧</h2>
+      </div>
 
-<button class="game-tile bubble-tile" data-game="bubble">
-<span>🫧</span>
-<span><b>Bubble Pop</b><small>Tap the bubbles as they float!</small><i>✨ Easy · Tap to play</i></span>
-<strong>→</strong>
-</button>
+      <div class="profile-card">
+        <div class="profile-avatar">🐻</div>
+        <h2>Little Learner</h2>
+        <p style="color:var(--muted);margin:10px 0 20px;">Learning through play!</p>
+        <div class="star-pill" style="display:inline-block;">⭐ <span id="profileStars">0</span> stars</div>
+        <p style="margin-top:20px;color:var(--muted);font-size:13px;">Your progress is saved on this device.</p>
+      </div>
+    </section>
 
-<button class="game-tile color-tile" data-game="color">
-<span>🎨</span>
-<span><b>Color Match</b><small>Find the color that matches.</small><i>🌈 Easy · Learn colors</i></span>
-<strong>→</strong>
-</button>
+    <!-- GAME PLAY -->
+    <section id="gameScreen" class="screen">
+      <button class="back-btn" onclick="showScreen('gamesScreen')">← Back to Games</button>
+      <div class="game-panel">
+        <h2 id="gameTitle">Let's Play!</h2>
+        <p class="game-instruction" id="gameInstruction">Have fun!</p>
+        <div id="gameArea"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="primary-btn" id="nextButton" onclick="nextRound()">Next Round ✨</button>
+      </div>
+    </section>
+  </main>
 
-<button class="game-tile shape-tile" data-game="shape">
-<span>🔺</span>
-<span><b>Shape Sorter</b><small>Put each shape in its home.</small><i>🧩 Easy · Drag or tap</i></span>
-<strong>→</strong>
-</button>
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-item active" data-screen="homeScreen" onclick="showScreen('homeScreen', this)">
+        <span>🏠</span>Home
+      </button>
+      <button class="nav-item" data-screen="learnScreen" onclick="showScreen('learnScreen', this)">
+        <span>📚</span>Learn
+      </button>
+      <button class="nav-item" data-screen="gamesScreen" onclick="showScreen('gamesScreen', this)">
+        <span>🎮</span>Games
+      </button>
+      <button class="nav-item" data-screen="rewardsScreen" onclick="showScreen('rewardsScreen', this)">
+        <span>🏆</span>Rewards
+      </button>
+      <button class="nav-item" data-screen="profileScreen" onclick="showScreen('profileScreen', this)">
+        <span>👧</span>Profile
+      </button>
+    </div>
+  </nav>
 
-<p class="gentle">💜 No timers, no pressure — just happy learning.</p>
-</section>
+  <script>
+    let stars = Number(localStorage.getItem("bubblyStars") || 0);
+    let currentGame = "";
+    let round = 0;
+    let completed = false;
+    let bubbleCount = 0;
+    let shapeTarget = "";
 
-<section class="screen" id="rewards">
-<div class="page-title">
-<p class="eyebrow">LOOK AT YOU GO!</p>
-<h1>Your rewards ⭐</h1>
-<p class="muted">Every game earns a little celebration.</p>
-</div>
+    const colors = [
+      { name: "Red", value: "#ff6b7f", emoji: "🍎" },
+      { name: "Blue", value: "#5bbcff", emoji: "🐟" },
+      { name: "Yellow", value: "#ffd34d", emoji: "⭐" },
+      { name: "Green", value: "#65d99a", emoji: "🐸" },
+      { name: "Purple", value: "#a58aff", emoji: "🍇" }
+    ];
 
-<div class="reward">
-<span>🏆</span>
-<p class="eyebrow">YOUR STAR COLLECTION</p>
-<h2 id="starTotal">0 stars</h2>
-<p class="muted">Keep exploring to collect more stars.</p>
-</div>
+    const shapes = [
+      { name: "Circle", emoji: "🔵" },
+      { name: "Square", emoji: "🟦" },
+      { name: "Triangle", emoji: "🔺" },
+      { name: "Star", emoji: "⭐" }
+    ];
 
-<div class="stats">
-<div>🎯<b id="activityTotal">0</b><small>Activities played</small></div>
-<div>🌟<b id="bestTotal">0</b><small>Best game score</small></div>
-</div>
+    function updateStars() {
+      document.getElementById("starCount").textContent = stars;
+      document.getElementById("progressText").textContent = stars + " stars earned";
+      document.getElementById("progressPercent").textContent = Math.min(stars * 10, 100) + "%";
+      document.getElementById("progressFill").style.width = Math.min(stars * 10, 100) + "%";
+      document.getElementById("rewardStars").textContent = stars + " Stars";
+      document.getElementById("profileStars").textContent = stars;
+      localStorage.setItem("bubblyStars", stars);
+    }
 
-<button class="primary centered" data-go="games">Earn more stars →</button>
-</section>
+    function showScreen(screenId, navButton) {
+      document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+      document.getElementById(screenId).classList.add("active");
 
-<section class="screen" id="profile">
-<div class="page-title">
-<p class="eyebrow">MY LITTLE SPACE</p>
-<h1>Hello, superstar! 😊</h1>
-<p class="muted">A happy place to learn at your own pace.</p>
-</div>
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
 
-<div class="profile-card">
-<span>🐻</span>
-<h2>Little Star</h2>
-<p class="muted">Curious learner · Big imagination</p>
-<div class="stats">
-<div><b id="profileStars">0</b><small>Stars</small></div>
-<div><b id="profileActs">0</b><small>Activities</small></div>
-</div>
-</div>
+      if (navButton) {
+        navButton.classList.add("active");
+      } else {
+        const matching = document.querySelector('[data-screen="' + screenId + '"]');
+        if (matching) matching.classList.add("active");
+      }
 
-<div class="tip">🧸 <span><b>For grown-ups</b><br>Bubbly Play is made for gentle, playful learning. Stay nearby and enjoy the games together.</span></div>
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-<button id="resetBtn" class="secondary centered">Reset play progress</button>
-</section>
+    function startGame(game) {
+      currentGame = game;
+      round = 0;
+      completed = false;
+      showScreen("gameScreen");
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("nextButton").classList.remove("hidden");
+      nextRound();
+    }
 
-<section class="screen play-screen" id="play">
-<div class="play-top">
-<button id="backBtn" class="secondary">← Games</button>
-<span class="score">⭐ <b id="score">0</b></span>
-</div>
+    function nextRound() {
+      completed = false;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("nextButton").classList.add("hidden");
 
-<div class="play-heading">
-<p class="eyebrow">LET'S PLAY</p>
-<h1 id="gameTitle">Bubble Pop!</h1>
-<p id="prompt">Tap the bubbles!</p>
-<small id="instructions" class="muted">Pop five bubbles to begin.</small>
-</div>
+      if (currentGame === "bubble") bubblePopGame();
+      if (currentGame === "color") colorMatchGame();
+      if (currentGame === "sort") shapeSorterGame();
+      if (currentGame === "fit") shapeFitGame();
+    }
 
-<div class="scene" id="scene">
-<div id="playArea"></div>
-</div>
+    function awardStar(message = "Great job! ⭐") {
+      if (completed) return;
+      completed = true;
+      stars++;
+      updateStars();
+      document.getElementById("feedback").textContent = message;
+      document.getElementById("nextButton").classList.remove("hidden");
+    }
 
-<p class="feedback" id="feedback">You're doing great! 💜</p>
+    // BUBBLE POP
+    function bubblePopGame() {
+      document.getElementById("gameTitle").textContent = "Bubble Pop 🫧";
+      document.getElementById("gameInstruction").textContent = "Tap all the floating bubbles!";
+      const area = document.getElementById("gameArea");
+      area.innerHTML = '<div class="bubble-area" id="bubbleArea"></div>';
+      const bubbleArea = document.getElementById("bubbleArea");
+      bubbleCount = 0;
 
-<div class="progress-row">
-<div class="track"><span id="gameBar"></span></div>
-<small id="roundText">0 of 5</small>
-</div>
+      const bubbleColors = ["#ffb8d2", "#bde8ff", "#ffe58a", "#b9f2d0", "#d7c8ff"];
 
-<div class="actions">
-<button id="pauseBtn" class="secondary">Pause</button>
-<button id="restartBtn" class="primary">Play again ↻</button>
-</div>
+      for (let i = 0; i < 10; i++) {
+        const bubble = document.createElement("button");
+        bubble.className = "bubble";
+        const size = 45 + Math.random() * 30;
+        bubble.style.width = size + "px";
+        bubble.style.height = size + "px";
+        bubble.style.background = bubbleColors[i % bubbleColors.length];
+        bubble.style.left = Math.random() * 80 + "%";
+        bubble.style.top = Math.random() * 75 + "%";
+        bubble.style.animationDelay = Math.random() + "s";
+        bubble.textContent = "✨";
 
-<p class="muted encouragement" id="encouragement">Every try is a little win!</p>
-</section>
+        bubble.onclick = () => {
+          bubble.remove();
+          bubbleCount++;
+          if (bubbleCount === 10) awardStar("You popped them all! Amazing! ⭐");
+        };
 
-</main>
+        bubbleArea.appendChild(bubble);
+      }
+    }
 
-<nav class="bottom-nav" aria-label="Main navigation">
-<button class="nav-item active" data-nav="home"><span>⌂</span><small>Home</small></button>
-<button class="nav-item" data-nav="learn"><span>🎓</span><small>Learn</small></button>
-<button class="nav-item" data-nav="games"><span>🎮</span><small>Games</small></button>
-<button class="nav-item" data-nav="rewards"><span>★</span><small>Rewards</small></button>
-<button class="nav-item" data-nav="profile"><span>☺</span><small>Profile</small></button>
-</nav>
+    // COLOR MATCH
+    function colorMatchGame() {
+      document.getElementById("gameTitle").textContent = "Color Match 🎨";
+      const target = colors[Math.floor(Math.random() * colors.length)];
+      document.getElementById("gameInstruction").innerHTML =
+        'Can you find <strong style="color:' + target.value + '">' + target.name + '</strong>?';
 
-<div class="toast" id="toast" role="status"></div>
+      const area = document.getElementById("gameArea");
+      area.innerHTML = '<div class="choice-row" id="colorChoices"></div>';
+      const choices = [...colors].sort(() => Math.random() - .5).slice(0, 4);
 
-<div class="modal-backdrop" id="modal" hidden>
-<div class="modal">
-<button id="closeModal" aria-label="Close">×</button>
-<div>🐰🌼</div>
-<p class="eyebrow">A LITTLE STORY</p>
-<h2>Bunny's Bright Day</h2>
-<p>Bunny hopped into the garden and found a yellow flower. “Hello, sunshine!” Bunny smiled. A tiny bee buzzed by, and they shared the warm morning together. Bunny learned that small things can bring big happiness.</p>
-<button class="primary" id="storyDone">Lovely story! ✨</button>
-</div>
-</div>
+      if (!choices.some(color => color.name === target.name)) {
+        choices[Math.floor(Math.random() * choices.length)] = target;
+      }
 
-<footer>Made with 💜 for little learners</footer>
+      choices.forEach(color => {
+        const button = document.createElement("button");
+        button.className = "color-choice";
+        button.style.background = color.value;
+        button.setAttribute("aria-label", color.name);
+        button.onclick = () => {
+          if (color.name === target.name) {
+            awardStar("You found " + target.name + "! ⭐");
+          } else {
+            document.getElementById("feedback").textContent = "Try another color! 😊";
+          }
+        };
+        document.getElementById("colorChoices").appendChild(button);
+      });
+    }
 
-</div>
+    // SHAPE SORTER
+    function shapeSorterGame() {
+      document.getElementById("gameTitle").textContent = "Shape Sorter 🔺";
+      const target = shapes[Math.floor(Math.random() * shapes.length)];
+      shapeTarget = target.name;
+      document.getElementById("gameInstruction").textContent =
+        "Tap the " + target.name + " shape!";
+
+      const choices = [...shapes].sort(() => Math.random() - .5);
+      const area = document.getElementById("gameArea");
+      area.innerHTML = '<div class="choice-row" id="shapeChoices"></div>';
+
+      choices.forEach(shape => {
+        const button = document.createElement("button");
+        button.className = "shape-piece";
+        button.style.background = "#eee8ff";
+        button.textContent = shape.emoji;
+        button.setAttribute("aria-label", shape.name);
+        button.onclick = () => {
+          if (shape.name === target.name) {
+            awardStar("Wonderful! That's the " + target.name + "! ⭐");
+          } else {
+            document.getElementById("feedback").textContent = "Not quite. Try again! 😊";
+          }
+        };
+        document.getElementById("shapeChoices").appendChild(button);
+      });
+    }
+
+    // SHAPE FIT PUZZLE
+    function shapeFitGame() {
+      document.getElementById("gameTitle").textContent = "Shape Fit Puzzle 🧩";
+      document.getElementById("gameInstruction").textContent =
+        "Tap a shape, then tap its matching empty space.";
+
+      const puzzleShapes = [...shapes].sort(() => Math.random() - .5).slice(0, 3);
+      let placed = 0;
+
+      const area = document.getElementById("gameArea");
+      area.innerHTML = `
+        <div class="shape-board" id="shapeBoard"></div>
+        <div class="shape-pieces" id="shapePieces"></div>
+      `;
+
+      const board = document.getElementById("shapeBoard");
+      const pieces = document.getElementById("shapePieces");
+      let selectedPiece = null;
+
+      puzzleShapes.forEach(shape => {
+        const slot = document.createElement("button");
+        slot.className = "shape-slot";
+        slot.dataset.shape = shape.name;
+        slot.setAttribute("aria-label", "Empty " + shape.name + " space");
+        slot.textContent = "?";
+
+        slot.onclick = () => {
+          if (!selectedPiece || slot.classList.contains("filled")) return;
+
+          if (selectedPiece.dataset.shape === slot.dataset.shape) {
+            slot.textContent = selectedPiece.textContent;
+            slot.classList.add("filled");
+            selectedPiece.remove();
+            selectedPiece = null;
+            placed++;
+
+            document.getElementById("feedback").textContent = "Perfect fit! 🎉";
+
+            if (placed === puzzleShapes.length) {
+              awardStar("Puzzle complete! You did it! ⭐");
+            }
+          } else {
+            document.getElementById("feedback").textContent = "Try a different space! 😊";
+          }
+        };
+
+        board.appendChild(slot);
+
+        const piece = document.createElement("button");
+        piece.className = "shape-piece";
+        piece.dataset.shape = shape.name;
+        piece.textContent = shape.emoji;
+        piece.setAttribute("aria-label", shape.name + " puzzle piece");
+
+        piece.onclick = () => {
+          selectedPiece = piece;
+          document.querySelectorAll(".shape-piece").forEach(item => {
+            item.style.outline = "none";
+          });
+          piece.style.outline = "4px solid #8b6cf6";
+          document.getElementById("feedback").textContent =
+            "Now tap the matching " + shape.name + " space!";
+        };
+
+        pieces.appendChild(piece);
+      });
+    }
+
+    updateStars();
+  </script>
 </body>
 </html>
