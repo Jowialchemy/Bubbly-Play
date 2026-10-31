@@ -1,519 +1,375 @@
+/* =========================================
+   BUBBLY PLAY — script.js
+   Little games. Big smiles!
+   ========================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  const $ = (id) => document.getElementById(id);
+let stars = Number(localStorage.getItem("bubblyStars") || 0);
+let currentGame = "";
+let completed = false;
+let bubbleCount = 0;
 
-  let currentScreen = "home";
-  let currentGame = "bubble";
-  let score = 0;
-  let round = 0;
-  let paused = false;
-  let soundOn = true;
-  let bestScore = Number(localStorage.getItem("bubblyBest") || 0);
-  let activities = Number(localStorage.getItem("bubblyActivities") || 0);
-  let stars = Number(localStorage.getItem("bubblyStars") || 0);
-  let dailyCount = Number(localStorage.getItem("bubblyDaily") || 0);
-  let gameTimer = null;
-  let toastTimer = null;
+const colors = [
+  { name: "Red", value: "#ff6b7f", emoji: "🍎" },
+  { name: "Blue", value: "#5bbcff", emoji: "🐟" },
+  { name: "Yellow", value: "#ffd34d", emoji: "⭐" },
+  { name: "Green", value: "#65d99a", emoji: "🐸" },
+  { name: "Purple", value: "#a58aff", emoji: "🍇" }
+];
 
-  const totalRounds = 5;
+const shapes = [
+  { name: "Circle", emoji: "🔵" },
+  { name: "Square", emoji: "🟦" },
+  { name: "Triangle", emoji: "🔺" },
+  { name: "Star", emoji: "⭐" }
+];
 
-  const games = {
-    bubble: {
-      title: "Bubble Pop!",
-      prompt: "Pop the floating bubbles!",
-      instructions: "Tap five bubbles to earn a star.",
-      encouragement: "Wonderful popping! 🫧"
-    },
-    color: {
-      title: "Color Match!",
-      prompt: "Find the matching color!",
-      instructions: "Tap the circle with the same color.",
-      encouragement: "You have a colorful imagination! 🌈"
-    },
-    shape: {
-      title: "Shape Sorter!",
-      prompt: "Find the matching shape!",
-      instructions: "Tap the shape that matches the target.",
-      encouragement: "Great shape sorting! 🔺"
-    }
-  };
+/* UPDATE STAR COUNTERS AND PROGRESS */
 
-  function saveProgress() {
-    localStorage.setItem("bubblyBest", bestScore);
-    localStorage.setItem("bubblyActivities", activities);
-    localStorage.setItem("bubblyStars", stars);
-    localStorage.setItem("bubblyDaily", dailyCount);
-    updateProgress();
-  }
+function updateStars() {
+  document.getElementById("starCount").textContent = stars;
+  document.getElementById("progressText").textContent = stars + " stars earned";
+  document.getElementById("progressPercent").textContent =
+    Math.min(stars * 10, 100) + "%";
 
-  function updateProgress() {
-    if ($("dailyCount")) {
-      $("dailyCount").textContent = Math.min(dailyCount, 5);
-    }
+  document.getElementById("progressFill").style.width =
+    Math.min(stars * 10, 100) + "%";
 
-    if ($("dailyBar")) {
-      $("dailyBar").style.width =
-        Math.min(dailyCount / 5 * 100, 100) + "%";
-    }
+  document.getElementById("rewardStars").textContent = stars + " Stars";
+  document.getElementById("profileStars").textContent = stars;
 
-    if ($("starTotal")) $("starTotal").textContent = stars + " stars";
-    if ($("activityTotal")) $("activityTotal").textContent = activities;
-    if ($("bestTotal")) $("bestTotal").textContent = bestScore;
-    if ($("profileStars")) $("profileStars").textContent = stars;
-    if ($("profileActs")) $("profileActs").textContent = activities;
-  }
+  localStorage.setItem("bubblyStars", stars);
+}
 
-  function showToast(message) {
-    const toast = $("toast");
-    if (!toast) return;
+/* NAVIGATION */
 
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 2200);
-  }
-
-  function stopGame() {
-    clearInterval(gameTimer);
-    gameTimer = null;
-  }
-
-  function showScreen(name) {
-    stopGame();
-
-    document.querySelectorAll(".screen").forEach(screen => {
-      screen.classList.remove("active");
-    });
-
-    const target = $(name);
-    if (target) target.classList.add("active");
-
-    document.querySelectorAll(".nav-item").forEach(button => {
-      button.classList.toggle("active", button.dataset.nav === name);
-    });
-
-    currentScreen = name;
-    updateProgress();
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function goToGame(game) {
-    if (!games[game]) return;
-
-    currentGame = game;
-    showScreen("play");
-    startGame();
-  }
-
-  document.querySelectorAll("[data-nav]").forEach(button => {
-    button.addEventListener("click", () => {
-      showScreen(button.dataset.nav);
-    });
+function showScreen(screenId, navButton) {
+  document.querySelectorAll(".screen").forEach(screen => {
+    screen.classList.remove("active");
   });
 
-  document.querySelectorAll("[data-go]").forEach(button => {
-    button.addEventListener("click", event => {
-      event.preventDefault();
-      showScreen(button.dataset.go);
-    });
+  const targetScreen = document.getElementById(screenId);
+
+  if (targetScreen) {
+    targetScreen.classList.add("active");
+  }
+
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.classList.remove("active");
   });
 
-  document.querySelectorAll("[data-game]").forEach(button => {
-    button.addEventListener("click", () => {
-      goToGame(button.dataset.game);
-    });
-  });
-
-  document.querySelectorAll("[data-category]").forEach(button => {
-    button.addEventListener("click", () => {
-      showToast(button.dataset.category + " activities are coming soon! 💜");
-    });
-  });
-
-  // Sound button
-  if ($("soundBtn")) {
-    $("soundBtn").addEventListener("click", () => {
-      soundOn = !soundOn;
-      $("soundBtn").textContent = soundOn ? "🔊" : "🔇";
-      showToast(soundOn ? "Sound is on!" : "Sound is off!");
-    });
-  }
-
-  // Gentle sound effect using browser audio
-  function playSound(frequency = 550) {
-    if (!soundOn) return;
-
-    try {
-      const AudioContext =
-        window.AudioContext || window.webkitAudioContext;
-
-      if (!AudioContext) return;
-
-      const audio = new AudioContext();
-      const oscillator = audio.createOscillator();
-      const gain = audio.createGain();
-
-      oscillator.connect(gain);
-      gain.connect(audio.destination);
-
-      oscillator.frequency.value = frequency;
-      oscillator.type = "sine";
-
-      gain.gain.setValueAtTime(0.12, audio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(
-        0.001,
-        audio.currentTime + 0.18
-      );
-
-      oscillator.start();
-      oscillator.stop(audio.currentTime + 0.18);
-
-      oscillator.onended = () => audio.close();
-    } catch (error) {
-      // Game remains playable if audio is unavailable.
-    }
-  }
-
-  function updateGameScore() {
-    if ($("score")) $("score").textContent = score;
-
-    if ($("gameBar")) {
-      $("gameBar").style.width =
-        Math.min(round / totalRounds * 100, 100) + "%";
-    }
-
-    if ($("roundText")) {
-      $("roundText").textContent =
-        Math.min(round, totalRounds) + " of " + totalRounds;
-    }
-  }
-
-  function randomPosition() {
-    return {
-      x: 8 + Math.random() * 72,
-      y: 12 + Math.random() * 68
-    };
-  }
-
-  function makeButton(className, content, x, y, callback) {
-    const button = document.createElement("button");
-    button.className = className;
-    button.type = "button";
-    button.textContent = content;
-    button.style.left = x + "%";
-    button.style.top = y + "%";
-
-    button.addEventListener("click", callback);
-
-    $("playArea").appendChild(button);
-    return button;
-  }
-
-  function startGame() {
-    stopGame();
-
-    score = 0;
-    round = 0;
-    paused = false;
-
-    $("gameTitle").textContent = games[currentGame].title;
-    $("prompt").textContent = games[currentGame].prompt;
-    $("instructions").textContent = games[currentGame].instructions;
-    $("feedback").textContent = "Let's have fun! 💜";
-    $("encouragement").textContent = "Every try is a little win!";
-    $("pauseBtn").textContent = "Pause";
-
-    $("playArea").innerHTML = "";
-    updateGameScore();
-
-    if (currentGame === "bubble") {
-      createBubbleGame();
-    } else if (currentGame === "color") {
-      createColorGame();
-    } else if (currentGame === "shape") {
-      createShapeGame();
-    }
-  }
-
-  // BUBBLE POP
-  function createBubbleGame() {
-    const colors = [
-      ["#d9caff", "#9d83ee"],
-      ["#ffcce5", "#ec8dbd"],
-      ["#b9ebdd", "#68c7a8"],
-      ["#ffe6ad", "#f2b74f"],
-      ["#bfe2ff", "#76b6eb"]
-    ];
-
-    for (let i = 0; i < 6; i++) {
-      const position = randomPosition();
-      const bubble = makeButton(
-        "play-bubble",
-        "🫧",
-        position.x,
-        position.y,
-        () => {
-          if (paused || bubble.disabled) return;
-
-          bubble.disabled = true;
-          bubble.style.transform = "scale(0)";
-          bubble.style.opacity = "0";
-
-          score++;
-          round++;
-
-          playSound(500 + score * 90);
-          $("feedback").textContent = [
-            "Pop! Wonderful! 🫧",
-            "Amazing! Keep going! ⭐",
-            "You're a bubble star! 💜",
-            "Fantastic popping! 🎉",
-            "You did it! Five bubbles! 🌟"
-          ][Math.min(round - 1, 4)];
-
-          updateGameScore();
-
-          if (round >= totalRounds) {
-            finishGame();
-          } else {
-            setTimeout(() => {
-              if (bubble.isConnected) {
-                const next = randomPosition();
-                bubble.style.left = next.x + "%";
-                bubble.style.top = next.y + "%";
-                bubble.style.opacity = "1";
-                bubble.style.transform = "scale(1)";
-                bubble.disabled = false;
-              }
-            }, 300);
-          }
-        }
-      );
-
-      const color = colors[i % colors.length];
-      bubble.style.background =
-        "radial-gradient(circle at 30% 25%, white, " +
-        color[0] + ", " + color[1] + ")";
-      bubble.setAttribute("aria-label", "Pop bubble " + (i + 1));
-    }
-  }
-
-  // COLOR MATCH
-  function createColorGame() {
-    const choices = [
-      { name: "Red", emoji: "🔴" },
-      { name: "Yellow", emoji: "🟡" },
-      { name: "Blue", emoji: "🔵" },
-      { name: "Green", emoji: "🟢" },
-      { name: "Purple", emoji: "🟣" }
-    ];
-
-    function nextRound() {
-      if (round >= totalRounds) {
-        finishGame();
-        return;
-      }
-
-      $("playArea").innerHTML = "";
-
-      const answer = choices[round % choices.length];
-
-      $("prompt").textContent = "Find " + answer.name + "!";
-      $("instructions").textContent = "Tap the matching color.";
-
-      const shuffled = [...choices].sort(() => Math.random() - 0.5);
-
-      shuffled.forEach((choice, index) => {
-        const positions = [
-          { x: 12, y: 22 },
-          { x: 60, y: 22 },
-          { x: 12, y: 62 },
-          { x: 60, y: 62 },
-          { x: 36, y: 42 }
-        ];
-
-        const position = positions[index];
-
-        makeButton(
-          "color-choice",
-          choice.emoji,
-          position.x,
-          position.y,
-          () => {
-            if (paused) return;
-
-            if (choice.name === answer.name) {
-              score++;
-              round++;
-              playSound(650);
-              $("feedback").textContent = "Yes! " + answer.name + "! 🌈";
-              updateGameScore();
-
-              setTimeout(nextRound, 650);
-            } else {
-              $("feedback").textContent = "Almost! Try again, little star! 💜";
-              playSound(250);
-            }
-          }
-        );
-      });
-    }
-
-    nextRound();
-  }
-
-  // SHAPE SORTER
-  function createShapeGame() {
-    const shapes = [
-      { name: "Triangle", emoji: "🔺" },
-      { name: "Square", emoji: "🟦" },
-      { name: "Circle", emoji: "🔵" },
-      { name: "Star", emoji: "⭐" },
-      { name: "Heart", emoji: "❤️" }
-    ];
-
-    function nextRound() {
-      if (round >= totalRounds) {
-        finishGame();
-        return;
-      }
-
-      $("playArea").innerHTML = "";
-
-      const answer = shapes[round % shapes.length];
-
-      $("prompt").textContent = "Find the " + answer.name + "!";
-      $("instructions").textContent = "Tap the matching shape.";
-
-      const shuffled = [...shapes].sort(() => Math.random() - 0.5);
-
-      shuffled.forEach((shape, index) => {
-        const positions = [
-          { x: 12, y: 22 },
-          { x: 60, y: 22 },
-          { x: 12, y: 62 },
-          { x: 60, y: 62 },
-          { x: 36, y: 42 }
-        ];
-
-        const position = positions[index];
-
-        makeButton(
-          "shape-choice",
-          shape.emoji,
-          position.x,
-          position.y,
-          () => {
-            if (paused) return;
-
-            if (shape.name === answer.name) {
-              score++;
-              round++;
-              playSound(700);
-              $("feedback").textContent =
-                "Brilliant! That's the " + answer.name + "! ⭐";
-
-              updateGameScore();
-              setTimeout(nextRound, 650);
-            } else {
-              $("feedback").textContent =
-                "Good try! Look for the " + answer.name + ". 💜";
-              playSound(250);
-            }
-          }
-        );
-      });
-    }
-
-    nextRound();
-  }
-
-  function finishGame() {
-    stopGame();
-
-    $("prompt").textContent = "You did it! 🎉";
-    $("instructions").textContent = "What a wonderful little learner!";
-    $("feedback").textContent = "You earned a star! ⭐";
-    $("encouragement").textContent = games[currentGame].encouragement;
-
-    stars++;
-    activities++;
-    dailyCount++;
-
-    if (score > bestScore) bestScore = score;
-
-    saveProgress();
-    updateGameScore();
-    playSound(850);
-
-    const message = document.createElement("div");
-    message.className = "game-finished";
-    message.innerHTML =
-      "<span>🏆</span><b>Wonderful work!</b><small>+1 star earned</small>";
-
-    $("playArea").appendChild(message);
-
-    if ($("restartBtn")) {
-      $("restartBtn").textContent = "Play again ↻";
-    }
-  }
-
-  // PAUSE / RESUME
-  $("pauseBtn").addEventListener("click", () => {
-    paused = !paused;
-    $("pauseBtn").textContent = paused ? "Resume" : "Pause";
-
-    $("feedback").textContent = paused
-      ? "Take a little break. 🌼"
-      : "Let's keep playing! 💜";
-  });
-
-  $("restartBtn").addEventListener("click", startGame);
-
-  $("backBtn").addEventListener("click", () => {
-    stopGame();
-    showScreen("games");
-  });
-
-  // STORY MODAL
-  function closeStory() {
-    $("modal").hidden = true;
-  }
-
-  $("storyBtn").addEventListener("click", () => {
-    $("modal").hidden = false;
-  });
-
-  $("closeModal").addEventListener("click", closeStory);
-  $("storyDone").addEventListener("click", () => {
-    closeStory();
-    showToast("Lovely listening! 📖");
-  });
-
-  $("modal").addEventListener("click", event => {
-    if (event.target === $("modal")) closeStory();
-  });
-
-  // RESET PROGRESS
-  $("resetBtn").addEventListener("click", () => {
-    const confirmed = window.confirm(
-      "Would you like to reset your stars and game progress?"
+  if (navButton) {
+    navButton.classList.add("active");
+  } else {
+    const matchingButton = document.querySelector(
+      '[data-screen="' + screenId + '"]'
     );
 
-    if (!confirmed) return;
+    if (matchingButton) {
+      matchingButton.classList.add("active");
+    }
+  }
 
-    activities = 0;
-    stars = 0;
-    dailyCount = 0;
-    bestScore = 0;
-
-    saveProgress();
-    showToast("Your progress has been reset.");
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
+}
 
-  updateProgress();
-});
+/* START A GAME */
+
+function startGame(game) {
+  currentGame = game;
+  completed = false;
+
+  showScreen("gameScreen");
+
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("nextButton").classList.add("hidden");
+
+  nextRound();
+}
+
+/* NEXT ROUND */
+
+function nextRound() {
+  completed = false;
+
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("nextButton").classList.add("hidden");
+
+  if (currentGame === "bubble") {
+    bubblePopGame();
+  }
+
+  if (currentGame === "color") {
+    colorMatchGame();
+  }
+
+  if (currentGame === "sort") {
+    shapeSorterGame();
+  }
+
+  if (currentGame === "fit") {
+    shapeFitGame();
+  }
+}
+
+/* AWARD A STAR */
+
+function awardStar(message = "Great job! ⭐") {
+  if (completed) return;
+
+  completed = true;
+  stars++;
+
+  updateStars();
+
+  document.getElementById("feedback").textContent = message;
+  document.getElementById("nextButton").classList.remove("hidden");
+}
+
+/* =========================================
+   GAME 1 — BUBBLE POP
+   ========================================= */
+
+function bubblePopGame() {
+  document.getElementById("gameTitle").textContent = "Bubble Pop 🫧";
+
+  document.getElementById("gameInstruction").textContent =
+    "Tap all the floating bubbles!";
+
+  const area = document.getElementById("gameArea");
+
+  area.innerHTML = `
+    <div class="bubble-area" id="bubbleArea"></div>
+  `;
+
+  const bubbleArea = document.getElementById("bubbleArea");
+
+  bubbleCount = 0;
+
+  const bubbleColors = [
+    "#ffb8d2",
+    "#bde8ff",
+    "#ffe58a",
+    "#b9f2d0",
+    "#d7c8ff"
+  ];
+
+  for (let i = 0; i < 10; i++) {
+    const bubble = document.createElement("button");
+
+    bubble.className = "bubble";
+
+    const size = 45 + Math.random() * 30;
+
+    bubble.style.width = size + "px";
+    bubble.style.height = size + "px";
+    bubble.style.background = bubbleColors[i % bubbleColors.length];
+    bubble.style.left = Math.random() * 80 + "%";
+    bubble.style.top = Math.random() * 75 + "%";
+    bubble.style.animationDelay = Math.random() + "s";
+
+    bubble.textContent = "✨";
+    bubble.setAttribute("aria-label", "Pop bubble");
+
+    bubble.onclick = () => {
+      bubble.remove();
+
+      bubbleCount++;
+
+      if (bubbleCount === 10) {
+        awardStar("You popped them all! Amazing! ⭐");
+      }
+    };
+
+    bubbleArea.appendChild(bubble);
+  }
+}
+
+/* =========================================
+   GAME 2 — COLOR MATCH
+   ========================================= */
+
+function colorMatchGame() {
+  document.getElementById("gameTitle").textContent = "Color Match 🎨";
+
+  const target = colors[Math.floor(Math.random() * colors.length)];
+
+  document.getElementById("gameInstruction").innerHTML =
+    'Can you find <strong style="color:' +
+    target.value +
+    '">' +
+    target.name +
+    "</strong>?";
+
+  const area = document.getElementById("gameArea");
+
+  area.innerHTML = `
+    <div class="choice-row" id="colorChoices"></div>
+  `;
+
+  const choices = [...colors]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 4);
+
+  if (!choices.some(color => color.name === target.name)) {
+    choices[Math.floor(Math.random() * choices.length)] = target;
+  }
+
+  choices.forEach(color => {
+    const button = document.createElement("button");
+
+    button.className = "color-choice";
+    button.style.background = color.value;
+    button.setAttribute("aria-label", color.name);
+
+    button.onclick = () => {
+      if (color.name === target.name) {
+        awardStar("You found " + target.name + "! ⭐");
+      } else {
+        document.getElementById("feedback").textContent =
+          "Try another color! 😊";
+      }
+    };
+
+    document.getElementById("colorChoices").appendChild(button);
+  });
+}
+
+/* =========================================
+   GAME 3 — SHAPE SORTER
+   ========================================= */
+
+function shapeSorterGame() {
+  document.getElementById("gameTitle").textContent = "Shape Sorter 🔺";
+
+  const target = shapes[Math.floor(Math.random() * shapes.length)];
+
+  document.getElementById("gameInstruction").textContent =
+    "Tap the " + target.name + " shape!";
+
+  const choices = [...shapes].sort(() => Math.random() - 0.5);
+
+  const area = document.getElementById("gameArea");
+
+  area.innerHTML = `
+    <div class="choice-row" id="shapeChoices"></div>
+  `;
+
+  choices.forEach(shape => {
+    const button = document.createElement("button");
+
+    button.className = "shape-piece";
+    button.style.background = "#eee8ff";
+    button.textContent = shape.emoji;
+    button.setAttribute("aria-label", shape.name);
+
+    button.onclick = () => {
+      if (shape.name === target.name) {
+        awardStar("Wonderful! That's the " + target.name + "! ⭐");
+      } else {
+        document.getElementById("feedback").textContent =
+          "Not quite. Try again! 😊";
+      }
+    };
+
+    document.getElementById("shapeChoices").appendChild(button);
+  });
+}
+
+/* =========================================
+   GAME 4 — SHAPE FIT PUZZLE
+   ========================================= */
+
+function shapeFitGame() {
+  document.getElementById("gameTitle").textContent =
+    "Shape Fit Puzzle 🧩";
+
+  document.getElementById("gameInstruction").textContent =
+    "Tap a shape, then tap its matching empty space.";
+
+  const puzzleShapes = [...shapes]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
+  let placed = 0;
+  let selectedPiece = null;
+
+  const area = document.getElementById("gameArea");
+
+  area.innerHTML = `
+    <div class="shape-board" id="shapeBoard"></div>
+    <div class="shape-pieces" id="shapePieces"></div>
+  `;
+
+  const board = document.getElementById("shapeBoard");
+  const pieces = document.getElementById("shapePieces");
+
+  puzzleShapes.forEach(shape => {
+    /* CREATE EMPTY SHAPE SPACE */
+
+    const slot = document.createElement("button");
+
+    slot.className = "shape-slot";
+    slot.dataset.shape = shape.name;
+    slot.setAttribute("aria-label", "Empty " + shape.name + " space");
+    slot.textContent = "?";
+
+    slot.onclick = () => {
+      if (!selectedPiece || slot.classList.contains("filled")) {
+        return;
+      }
+
+      if (selectedPiece.dataset.shape === slot.dataset.shape) {
+        slot.textContent = selectedPiece.textContent;
+        slot.classList.add("filled");
+
+        selectedPiece.remove();
+        selectedPiece = null;
+
+        placed++;
+
+        document.getElementById("feedback").textContent =
+          "Perfect fit! 🎉";
+
+        if (placed === puzzleShapes.length) {
+          awardStar("Puzzle complete! You did it! ⭐");
+        }
+      } else {
+        document.getElementById("feedback").textContent =
+          "Try a different space! 😊";
+      }
+    };
+
+    board.appendChild(slot);
+
+    /* CREATE MOVABLE SHAPE PIECE */
+
+    const piece = document.createElement("button");
+
+    piece.className = "shape-piece";
+    piece.dataset.shape = shape.name;
+    piece.textContent = shape.emoji;
+    piece.setAttribute("aria-label", shape.name + " puzzle piece");
+
+    piece.onclick = () => {
+      selectedPiece = piece;
+
+      document.querySelectorAll(".shape-piece").forEach(item => {
+        item.style.outline = "none";
+      });
+
+      piece.style.outline = "4px solid #8b6cf6";
+
+      document.getElementById("feedback").textContent =
+        "Now tap the matching " + shape.name + " space!";
+    };
+
+    pieces.appendChild(piece);
+  });
+}
+
+/* LOAD SAVED STARS */
+
+updateStars();
